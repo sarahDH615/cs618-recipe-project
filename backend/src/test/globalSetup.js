@@ -4,7 +4,7 @@ import { MongoMemoryServer } from 'mongodb-memory-server'
 export default async function globalSetup() {
   const instance = await MongoMemoryServer.create({
     binary: {
-      version: '6.0.4',
+      version: '8.0.0', // version 6.0.4 as specified in the textbook, gives error
     },
   })
   // global variable
