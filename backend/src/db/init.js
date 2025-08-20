@@ -2,7 +2,7 @@ import mongoose from 'mongoose'
 
 export function initDatabase() {
   // use mongodb db with database name blog
-  const DATABASE_URL = 'mongodb://localhost:27017/blog'
+  const DATABASE_URL = process.env.DATABASE_URL
   //   create a listener on the opening of the mongoose connection
   //   it will log when it has been opened
   mongoose.connection.on('open', () => {
