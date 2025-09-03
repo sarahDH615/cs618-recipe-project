@@ -1,17 +1,15 @@
 import { useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { createRecipe } from '../api/recipes'
+import { createRecipe } from '../api/recipes.js'
 
 export function CreateRecipe() {
   const [title, setTitle] = useState('') // default: ''
-  const [ingredients, setIngredients] = useState('')
+  const [ingredients, setIngredients] = useState([])
   const [image, setImage] = useState('')
-
-  const ingredientsArr = ingredients.split(', ')
 
   const queryClient = useQueryClient()
   const createPostMutation = useMutation({
-    mutationFn: () => createRecipe({ title, ingredientsArr, image }),
+    mutationFn: () => createRecipe({ title, ingredients, image }),
     onSuccess: () => queryClient.invalidateQueries(['recipes']), // means only the recipes part of the page will update
   })
 
@@ -36,15 +34,18 @@ export function CreateRecipe() {
       </div>
       <textarea
         value={ingredients}
-        onChange={(e) => setIngredients(e.target.value)}
+        onChange={(e) => setIngredients(e.target.value.split(', '))}
       />
       <br />
       <div>
         <label htmlFor='add-image'>Image URL: </label>
         <input
-          type='text'
+          type='url'
           name='add-image'
           id='add-image'
+          placeholder='https://example.com'
+          pattern='https://.*'
+          size='30'
           value={image}
           onChange={(e) => setImage(e.target.value)}
         />
