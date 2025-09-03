@@ -1,19 +1,17 @@
 import { initDatabase } from './db/init.js'
-import { Post } from './db/models/post.js'
+import { Recipe } from './db/models/recipe.js'
 
 await initDatabase() // async
 
-const post = new Post({
-  title: 'Hello Mongoose',
-  author: 'S. Hood',
-  contents: 'This post is stored in a MongoDB database using Mongoose.',
-  tags: ['mongoose', 'mongodb'],
+const recipe = new Recipe({
+  title: 'Cinnamon oats',
+  ingredients: ['oats', 'cinnamon'],
 })
-const createdPost = await post.save() // save the post in the db and to a variable
+const createdRecipe = await recipe.save() // save the recipe in the db and to a variable
 
-await Post.findByIdAndUpdate(createdPost._id, {
-  $set: { title: 'Hello again, Mongoose!' },
+await Recipe.findByIdAndUpdate(createdRecipe._id, {
+  $set: { title: 'Cinnamon oatmeal' },
 })
 
-const posts = await Post.find() // return all Post instances
-console.log(posts)
+const recipes = await Recipe.find() // return all Post instances
+console.log(recipes)
