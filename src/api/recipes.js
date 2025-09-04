@@ -7,6 +7,7 @@ export const getRecipes = async (queryParams) => {
 }
 
 export const createRecipe = async (recipe) => {
+  recipe.ingredients = recipe.ingredients.map((i) => i.name) // strip recipes to just name
   const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/recipes`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
