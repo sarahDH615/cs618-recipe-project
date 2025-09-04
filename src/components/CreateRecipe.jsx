@@ -1,9 +1,6 @@
 import { useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { createRecipe } from '../api/recipes.js'
-import { Ingredients } from './Ingredients.jsx'
-
-// let nextId = 0
 
 export function CreateRecipe() {
   const [title, setTitle] = useState('') // default: ''
@@ -18,6 +15,7 @@ export function CreateRecipe() {
 
   const handleSubmit = (e) => {
     e.preventDefault()
+    console.log(ingredients)
     createPostMutation.mutate()
   }
 
@@ -35,7 +33,15 @@ export function CreateRecipe() {
           onChange={(e) => setTitle(e.target.value)}
         />
       </div>
-      <Ingredients ingredients={ingredients} onChange={setIngredients} />
+      <label htmlFor='add-ingredients'>Ingredients: </label>
+      <br />
+      <textarea
+        name='add-ingredients'
+        value={ingredients}
+        placeholder={`eggs\nflour\nmilk`}
+        rows='5'
+        onChange={(e) => setIngredients(e.target.value)}
+      />
       <br />
       <div>
         <label htmlFor='add-image'>Image URL: </label>
