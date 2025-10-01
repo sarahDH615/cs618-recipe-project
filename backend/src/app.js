@@ -1,5 +1,6 @@
 import express from 'express'
 import { recipesRoutes } from './routes/recipes.js'
+import { userRoutes } from './routes/users.js'
 import bodyParser from 'body-parser'
 import cors from 'cors'
 
@@ -8,6 +9,7 @@ const app = express() // create express instance
 app.use(cors())
 app.use(bodyParser.json()) // intercepts the requests and converts them to json
 recipesRoutes(app) // call recipesRoutes with express instance as param
+userRoutes(app)
 
 // default route
 app.get('/', (req, res) => {

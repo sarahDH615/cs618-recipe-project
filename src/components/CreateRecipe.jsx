@@ -1,23 +1,27 @@
 import { useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { createRecipe } from '../api/recipes.js'
+import { useAuth } from '../contexts/AuthContext.jsx'
 
 export function CreateRecipe() {
   const [title, setTitle] = useState('') // default: ''
   const [ingredients, setIngredients] = useState([])
   const [image, setImage] = useState('')
+  const [token] = useAuth()
 
   const queryClient = useQueryClient()
-  const createPostMutation = useMutation({
-    mutationFn: () => createRecipe({ title, ingredients, image }),
+  const createRecipeMutation = useMutation({
+    mutationFn: () => createRecipe(token, { title, ingredients, image }),
     onSuccess: () => queryClient.invalidateQueries(['recipes']), // means only the recipes part of the page will update
   })
 
   const handleSubmit = (e) => {
     e.preventDefault()
     console.log(ingredients)
-    createPostMutation.mutate()
+    createRecipeMutation.mutate()
   }
+
+  if (!token) return <div>Please log in to create new recipes.</div>
 
   //   e.preventDefault prevents page refresh when a form is submitted
   // prevent the submit button from clicking when there's no title or a post is pending
@@ -60,11 +64,11 @@ export function CreateRecipe() {
       <br />
       <input
         type='submit'
-        value={createPostMutation.isPending ? 'Creating...' : 'Create'}
-        disabled={!title || createPostMutation.isPending}
+        value={createRecipeMutation.isPending ? 'Creating...' : 'Create'}
+        disabled={!title || createRecipeMutation.isPending}
       />
 
-      {createPostMutation.isSuccess ? (
+      {createRecipeMutation.isSuccess ? (
         <>
           <br />
           Post successfully created!

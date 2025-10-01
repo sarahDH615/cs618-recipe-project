@@ -1,36 +1,48 @@
 import mongoose from 'mongoose'
-import { describe, expect, test, beforeEach } from '@jest/globals'
+import { describe, expect, test, beforeEach, beforeAll } from '@jest/globals'
 import { Recipe } from '../db/models/recipe.js'
 import {
   createRecipe,
   listAllRecipes,
+  listRecipesByAuthor,
   listRecipesByIngredient,
   getRecipeById,
   updateRecipe,
   deleteRecipe,
 } from '../services/recipes.js'
 
+import { createUser } from '../services/users.js'
+
 // creating sample data
-const sampleRecipes = [
-  {
-    title: 'Ice cream',
-    ingredients: ['eggs', 'cream', 'vanilla'],
-    image: 'http://test/test1.jpg',
-  },
-  {
-    title: 'BLT Sandwich',
-    ingredients: ['bacon', 'lettuce', 'tomato', 'bread'],
-    image: 'http://test/test2.png',
-  },
-  {
-    title: 'Ice water',
-    ingredients: ['ice', 'water'],
-    image: 'http://test/test3.jpeg',
-  },
-  {
-    title: 'Toast',
-  },
-]
+let sampleRecipes = [] // 'let' so it can be changed
+let testUser = null
+beforeAll(async () => {
+  testUser = await createUser({ username: 'sample', password: 'user' })
+  sampleRecipes = [
+    {
+      title: 'Ice cream',
+      author: testUser._id,
+      ingredients: ['eggs', 'cream', 'vanilla'],
+      image: 'http://test/test1.jpg',
+    },
+    {
+      title: 'BLT Sandwich',
+      author: testUser._id,
+      ingredients: ['bacon', 'lettuce', 'tomato', 'bread'],
+      image: 'http://test/test2.png',
+    },
+    {
+      title: 'Ice water',
+      author: testUser._id,
+      ingredients: ['ice', 'water'],
+      image: 'http://test/test3.jpeg',
+    },
+    {
+      title: 'Toast',
+      author: testUser._id,
+    },
+  ]
+})
 
 let createdSampleRecipes = []
 
@@ -56,7 +68,7 @@ describe('creating recipes', () => {
       title: 'Blueberry yoghurt',
       ingredients: ['blueberries', 'milk'],
     }
-    const createdRecipe = await createRecipe(recipe)
+    const createdRecipe = await createRecipe(testUser._id, recipe)
     // expect createdRecipe's id to be an instance of a mongoose object id
     expect(createdRecipe._id).toBeInstanceOf(mongoose.Types.ObjectId)
 
@@ -75,7 +87,7 @@ describe('creating recipes', () => {
       ingredients: ['empty'],
     }
     try {
-      await createRecipe(recipe)
+      await createRecipe(testUser._id, recipe)
     } catch (err) {
       expect(err).toBeInstanceOf(mongoose.Error.ValidationError)
       expect(err.message).toContain('`title` is required')
@@ -86,7 +98,7 @@ describe('creating recipes', () => {
     const recipe = {
       title: 'Title only recipe',
     }
-    const createdRecipe = await createRecipe(recipe)
+    const createdRecipe = await createRecipe(testUser._id, recipe)
     expect(createdRecipe._id).toBeInstanceOf(mongoose.Types.ObjectId)
   })
 })
@@ -126,6 +138,11 @@ describe('listing recipes', () => {
     const recipes = await listRecipesByIngredient('water')
     expect(recipes.length).toBe(1)
   })
+  // test 5: filter by author
+  test('should be able to filter posts by author', async () => {
+    const posts = await listRecipesByAuthor(testUser.username)
+    expect(posts.length).toBe(4)
+  })
 })
 // GET
 describe('getting a recipe', () => {
@@ -142,21 +159,21 @@ describe('getting a recipe', () => {
 // UPDATE
 describe('updating recipes', () => {
   test('should update the specified property', async () => {
-    await updateRecipe(createdSampleRecipes[0]._id, {
+    await updateRecipe(testUser._id, createdSampleRecipes[0]._id, {
       title: 'Test Title',
     })
     const updatedRecipe = await Recipe.findById(createdSampleRecipes[0]._id)
     expect(updatedRecipe.title).toEqual('Test Title')
   })
   test('should not update other properties', async () => {
-    await updateRecipe(createdSampleRecipes[0]._id, {
+    await updateRecipe(testUser._id, createdSampleRecipes[0]._id, {
       image: 'http://test/new.jpg',
     })
     const updatedRecipe = await Recipe.findById(createdSampleRecipes[0]._id)
     expect(updatedRecipe.ingredients[0]).toEqual('eggs')
   })
   test('should update the updatedAt timestamp', async () => {
-    await updateRecipe(createdSampleRecipes[0]._id, {
+    await updateRecipe(testUser._id, createdSampleRecipes[0]._id, {
       title: 'Test Title',
     })
     const updatedRecipe = await Recipe.findById(createdSampleRecipes[0]._id)
@@ -166,16 +183,20 @@ describe('updating recipes', () => {
     )
   })
   test('should fail if the id does not exist', async () => {
-    const recipe = await updateRecipe('000000000000000000000000', {
-      title: 'Test Title',
-    })
+    const recipe = await updateRecipe(
+      testUser._id,
+      '000000000000000000000000',
+      {
+        title: 'Test Title',
+      },
+    )
     expect(recipe).toEqual(null)
   })
 })
 describe('deleting recipes', () => {
   // delete a recipe that exists
   test('should remove the recipe from the database', async () => {
-    const result = await deleteRecipe(createdSampleRecipes[0]._id)
+    const result = await deleteRecipe(testUser._id, createdSampleRecipes[0]._id)
     expect(result.deletedCount).toEqual(1)
     const deletedRecipe = await Recipe.findById(createdSampleRecipes[0]._id)
     expect(deletedRecipe).toEqual(null)
