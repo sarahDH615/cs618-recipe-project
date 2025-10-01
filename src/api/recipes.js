@@ -6,11 +6,14 @@ export const getRecipes = async (queryParams) => {
   return await res.json()
 }
 
-export const createRecipe = async (recipe) => {
-  recipe.ingredients = recipe.ingredients.map((i) => i.name) // strip recipes to just name
+export const createRecipe = async (token, recipe) => {
+  recipe.ingredients = recipe.ingredients.split('\n')
   const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/recipes`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
     body: JSON.stringify(recipe),
   })
   return await res.json()

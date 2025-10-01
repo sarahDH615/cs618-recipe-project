@@ -1,20 +1,25 @@
 import {
   listAllRecipes,
-  listRecipesByTitle,
+  listRecipesByAuthor,
   getRecipeById,
   createRecipe,
   updateRecipe,
   deleteRecipe,
 } from '../services/recipes.js'
 
+import { requireAuth } from '../middleware/jwt.js'
+
 export function recipesRoutes(app) {
   // get all recipes
   app.get('/api/v1/recipes', async (req, res) => {
-    const { sortBy, sortOrder, title } = req.query
+    // const { sortBy, sortOrder, title } = req.query
+    const { sortBy, sortOrder, author } = req.query
     const options = { sortBy, sortOrder }
     try {
-      if (title) {
-        return res.json(await listRecipesByTitle(title, options))
+      // if (title) {
+      //   return res.json(await listRecipesByTitle(title, options))
+      if (author) {
+        return res.json(await listRecipesByAuthor(author, options))
       } else {
         return res.json(await listAllRecipes(options))
       }
@@ -38,9 +43,9 @@ export function recipesRoutes(app) {
     }
   })
   // create a recipe
-  app.post('/api/v1/recipes', async (req, res) => {
+  app.post('/api/v1/recipes', requireAuth, async (req, res) => {
     try {
-      const recipe = await createRecipe(req.body)
+      const recipe = await createRecipe(req.auth.sub, req.body)
       return res.json(recipe)
     } catch (err) {
       console.error('error creating recipe: ', err)
@@ -48,9 +53,9 @@ export function recipesRoutes(app) {
     }
   })
   // update a recipe
-  app.patch('/api/v1/recipes/:id', async (req, res) => {
+  app.patch('/api/v1/recipes/:id', requireAuth, async (req, res) => {
     try {
-      const recipe = await updateRecipe(req.params.id, req.body)
+      const recipe = await updateRecipe(req.auth.sub, req.params.id, req.body)
       return res.json(recipe)
     } catch (err) {
       console.error('error updating recipe: ', err)
@@ -58,9 +63,9 @@ export function recipesRoutes(app) {
     }
   })
   // delete a recipe
-  app.delete('/api/v1/recipes/:id', async (req, res) => {
+  app.delete('/api/v1/recipes/:id', requireAuth, async (req, res) => {
     try {
-      const { deletedCount } = await deleteRecipe(req.params.id)
+      const { deletedCount } = await deleteRecipe(req.auth.sub, req.params.id)
       if (deletedCount === 0) {
         return res.sendStatus(404)
       }

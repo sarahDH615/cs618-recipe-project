@@ -1,57 +1,32 @@
 import { useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { createRecipe } from '../api/recipes.js'
-import { AddIngredient } from './AddIngredient.jsx'
-import { IngredientsList } from './IngredientsList.jsx'
-
-let nextId = 0
+import { useAuth } from '../contexts/AuthContext.jsx'
 
 export function CreateRecipe() {
   const [title, setTitle] = useState('') // default: ''
   const [ingredients, setIngredients] = useState([])
   const [image, setImage] = useState('')
+  const [token] = useAuth()
 
   const queryClient = useQueryClient()
-  const createPostMutation = useMutation({
-    mutationFn: () => createRecipe({ title, ingredients, image }),
+  const createRecipeMutation = useMutation({
+    mutationFn: () => createRecipe(token, { title, ingredients, image }),
     onSuccess: () => queryClient.invalidateQueries(['recipes']), // means only the recipes part of the page will update
   })
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    createPostMutation.mutate()
+    console.log(ingredients)
+    createRecipeMutation.mutate()
   }
 
-  function handleAddIngredient(ingredientName) {
-    setIngredients([
-      ...ingredients,
-      {
-        id: nextId++,
-        name: ingredientName,
-      },
-    ])
-  }
-
-  function handleChangeIngredient(newIngredient) {
-    setIngredients(
-      ingredients.map((t) => {
-        if (t.id === newIngredient.id) {
-          return newIngredient
-        } else {
-          return t
-        }
-      }),
-    )
-  }
-
-  function handleDeleteIngredient(ingredientToDelete) {
-    setIngredients(ingredients.filter((t) => t.id !== ingredientToDelete))
-  }
+  if (!token) return <div>Please log in to create new recipes.</div>
 
   //   e.preventDefault prevents page refresh when a form is submitted
   // prevent the submit button from clicking when there's no title or a post is pending
   return (
-    <form onSubmit={handleSubmit}>
+    <form name='recipe' onSubmit={handleSubmit}>
       <div>
         <label htmlFor='create-title'>Title: </label>
         <input
@@ -62,11 +37,14 @@ export function CreateRecipe() {
           onChange={(e) => setTitle(e.target.value)}
         />
       </div>
-      <AddIngredient onAddIngredient={handleAddIngredient} />
-      <IngredientsList
-        ingredients={ingredients}
-        onChangeIngredient={handleChangeIngredient}
-        onDeleteIngredient={handleDeleteIngredient}
+      <label htmlFor='add-ingredients'>Ingredients: </label>
+      <br />
+      <textarea
+        name='add-ingredients'
+        value={ingredients}
+        placeholder={`eggs\nflour\nmilk`}
+        rows='5'
+        onChange={(e) => setIngredients(e.target.value)}
       />
       <br />
       <div>
@@ -86,11 +64,11 @@ export function CreateRecipe() {
       <br />
       <input
         type='submit'
-        value={createPostMutation.isPending ? 'Creating...' : 'Create'}
-        disabled={!title || createPostMutation.isPending}
+        value={createRecipeMutation.isPending ? 'Creating...' : 'Create'}
+        disabled={!title || createRecipeMutation.isPending}
       />
 
-      {createPostMutation.isSuccess ? (
+      {createRecipeMutation.isSuccess ? (
         <>
           <br />
           Post successfully created!
