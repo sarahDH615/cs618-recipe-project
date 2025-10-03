@@ -2,15 +2,16 @@ import { useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { createRecipe } from '../api/recipes.js'
 import { useAuth } from '../contexts/AuthContext.jsx'
+// import { useForm } from 'react-hook-form'
+// import { ImageUploader } from './ImageUploader.jsx'
 import { RecipeTitle } from './RecipeTitle.jsx'
 import { RecipeIngredients } from './RecipeIngredients.jsx'
-import { ImageUploader } from './ImageUploader.jsx'
 
 export function CreateRecipe() {
   const [title, setTitle] = useState('') // default: ''
-  const [ingredients, setIngredients] = useState('')
+  const [ingredients, setIngredients] = useState([])
   const [image, setImage] = useState('')
-  const [file, setFile] = useState(new Object())
+  const [file, setFile] = useState('')
   const [token] = useAuth()
 
   const queryClient = useQueryClient()
@@ -33,14 +34,16 @@ export function CreateRecipe() {
   }
 
   const setImageConfirmation = (e) => {
+    alert('he')
     e.preventDefault()
-    console.log(file.name)
-    // do some sort of upload function here and set that output to be the image
+    console.log(file)
+    console.log(e.get('add-image'))
     setImage(file.name)
   }
 
   const handleSubmit = (e) => {
     e.preventDefault()
+    console.log(title)
     console.log(ingredients)
     createRecipeMutation.mutate()
   }
@@ -56,14 +59,38 @@ export function CreateRecipe() {
         ingredients={ingredients}
         handleIngredientsChange={updateIngredients}
       />
-      <ImageUploader
+      {/* <ImageUploader
+        image={image}
         file={file}
         handleImageSelection={updateFileSelection}
         handleConfirmFileChoice={setImageConfirmation}
-      />
-      <br />
-      <br />
+      /> */}
+      <div>
+        <label htmlFor='add-image'>Image URL: </label>
+        <input
+          type='file'
+          name='add-image'
+          id='file'
+          onChange={updateFileSelection}
+        />
+        {file && (
+          <section>
+            File details:
+            <ul>
+              <li>Name: {file.name}</li>
+              <li>Type: {file.type}</li>
+              <li>Size: {file.size} bytes</li>
+            </ul>
+          </section>
+        )}
+        {file && (
+          <button formAction={setImageConfirmation}>
+            Confirm image choice
+          </button>
+        )}
+      </div>
       <input
+        form='recipe'
         type='submit'
         value={createRecipeMutation.isPending ? 'Creating...' : 'Create'}
         disabled={!title || createRecipeMutation.isPending}
