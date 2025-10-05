@@ -1,19 +1,17 @@
 import { useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { createRecipe } from '../api/recipes.js'
-import { uploadImage } from '../api/images.js'
 import { useAuth } from '../contexts/AuthContext.jsx'
+// import { useForm } from 'react-hook-form'
+// import { ImageUploader } from './ImageUploader.jsx'
 import { RecipeTitle } from './RecipeTitle.jsx'
 import { RecipeIngredients } from './RecipeIngredients.jsx'
-import { ImageUploader } from './ImageUploader.jsx'
 
 export function CreateRecipe() {
   const [title, setTitle] = useState('') // default: ''
-  const [ingredients, setIngredients] = useState('')
+  const [ingredients, setIngredients] = useState([])
   const [image, setImage] = useState('')
-  const [file, setFile] = useState(new Object())
-  const [isSelected, setIsSelected] = useState(false)
-  const [isConfirmed, setIsConfirmed] = useState(false)
+  const [file, setFile] = useState('')
   const [token] = useAuth()
 
   const queryClient = useQueryClient()
@@ -30,32 +28,23 @@ export function CreateRecipe() {
     setIngredients(e.target.value)
   }
 
-  const updateFileSelection = async (e) => {
+  const updateFileSelection = (e) => {
     console.log(e.target.files[0])
     setFile(e.target.files[0])
-    setIsSelected(true)
-    const result = await uploadImage(token, e.target.files[0])
-    console.log('result back from uploadImage in CreateRecipe')
-    console.log(`title: ${title}`)
-    console.log(`ingredients: ${ingredients}`)
-    console.log(`image: ${result.image_url}`)
-    setImage(result.image_url)
-    setIsConfirmed(true)
-    console.log(`is confirmed?: ${isConfirmed}`)
   }
 
-  const resetStates = () => {
-    // reset vars
-    setTitle('')
-    setIngredients('')
-    setImage('')
-    setFile(new Object())
-    setIsSelected(false)
-    setIsConfirmed(false)
-  }
-
-  const handleSubmit = async (e) => {
+  const setImageConfirmation = (e) => {
+    alert('he')
     e.preventDefault()
+    console.log(file)
+    console.log(e.get('add-image'))
+    setImage(file.name)
+  }
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    console.log(title)
+    console.log(ingredients)
     createRecipeMutation.mutate()
   }
 
@@ -65,26 +54,49 @@ export function CreateRecipe() {
   // prevent the submit button from clicking when there's no title or a post is pending
   return (
     <form name='recipe' onSubmit={handleSubmit}>
-      <button type='button' id='clear-fields' onClick={resetStates}>
-        Clear fields
-      </button>
       <RecipeTitle title={title} handleTitleChange={updateTitle} />
       <RecipeIngredients
         ingredients={ingredients}
         handleIngredientsChange={updateIngredients}
       />
-      <ImageUploader
+      {/* <ImageUploader
+        image={image}
         file={file}
-        isSelected={isSelected}
         handleImageSelection={updateFileSelection}
-      />
+        handleConfirmFileChoice={setImageConfirmation}
+      /> */}
+      <div>
+        <label htmlFor='add-image'>Image URL: </label>
+        <input
+          type='file'
+          name='add-image'
+          id='file'
+          onChange={updateFileSelection}
+        />
+        {file && (
+          <section>
+            File details:
+            <ul>
+              <li>Name: {file.name}</li>
+              <li>Type: {file.type}</li>
+              <li>Size: {file.size} bytes</li>
+            </ul>
+          </section>
+        )}
+        {file && (
+          <button formAction={setImageConfirmation}>
+            Confirm image choice
+          </button>
+        )}
+      </div>
       <input
+        form='recipe'
         type='submit'
         value={createRecipeMutation.isPending ? 'Creating...' : 'Create'}
-        disabled={!title || !isConfirmed || createRecipeMutation.isPending}
+        disabled={!title || createRecipeMutation.isPending}
       />
 
-      {createRecipeMutation.isSuccess && title ? (
+      {createRecipeMutation.isSuccess ? (
         <>
           <br />
           Post successfully created!
