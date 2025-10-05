@@ -31,43 +31,48 @@ export function CreateRecipe() {
     setIngredients(e.target.value)
   }
 
-  const updateFileSelection = (e) => {
+  const updateFileSelection = async (e) => {
     console.log(e.target.files[0])
     // console.log(Object.keys(e.target.files[0]))
     setFile(e.target.files[0])
     setIsSelected(true)
-  }
-
-  const setImageConfirmation = async (e) => {
-    e.preventDefault()
-    const result = await uploadImage(token, file)
-    // console.log('result back from uploadImage in CreateRecipe')
+    const result = await uploadImage(token, e.target.files[0])
+    console.log('result back from uploadImage in CreateRecipe')
     // console.log(result)
+    console.log(`title: ${title}`)
+    console.log(`ingredients: ${ingredients}`)
+    console.log(`image: ${result.image_url}`)
     // setIsSelected(false)
     // setIsConfirmed(true)
     setImage(result.image_url)
   }
 
-  const resetStates = () => {
-    // reset vars
-    setTitle('')
-    setIngredients('')
-    setImage('')
-    setFile(new Object())
-    setIsSelected(false)
+  const setImageConfirmation = async () => {
+    // e.preventDefault()
+    // console.log('button clicked, waiting for response...')
+    // const result = await uploadImage(token, file)
+    // console.log('result back from uploadImage in CreateRecipe')
+    // console.log(result)
+    // // setIsSelected(false)
+    // // setIsConfirmed(true)
+    // setImage(result.image_url)
+    console.log('click')
   }
 
-  const handleSubmit = (e) => {
+  // const resetStates = () => {
+  //   // reset vars
+  //   setTitle('')
+  //   setIngredients('')
+  //   setImage('')
+  //   setFile(new Object())
+  //   setIsSelected(false)
+  // }
+
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    console.log(image)
-    // // reset vars
-    // setTitle('')
-    // setIngredients('')
-    // setImage('')
-    // setFile(new Object())
-    // setIsSelected(false)
+    // setImage(result.image_url)
     createRecipeMutation.mutate()
-    resetStates()
+    // resetStates()
   }
 
   if (!token) return <div>Please log in to create new recipes.</div>
