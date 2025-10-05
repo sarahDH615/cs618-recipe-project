@@ -1,51 +1,59 @@
-export const uploadImage = async (file) => {
-  console.log(file)
-  console.log(`url: ${import.meta.env.VITE_BACKEND_URL}/image/upload`)
+export const uploadImage = async (token, file) => {
+  // console.log(file)
+  // console.log(`url: ${import.meta.env.VITE_BACKEND_URL}/image/upload`)
   let formData = new FormData()
-  // formData.append('file', file)
-  formData.append('image', file)
-  fetch(`${import.meta.env.VITE_BACKEND_URL}/image/upload`, {
+  // formData.append('image', file) // arg[0] is the name multer may look under
+  formData.append('file', file) // arg[0] for front end sides, need to specify file
+  formData.append('upload_preset', 'ml_default')
+  const url = 'https://api.cloudinary.com/v1_1/dw7kpbs2t/image/upload'
+
+  const res = await fetch(url, {
+    // mode: 'no-cors',
     method: 'POST',
     body: formData,
   })
-    .then((resp) => resp.json())
-    .then((data) => {
-      if (data.errors) {
-        alert(data.errors)
-      } else {
-        console.log('returned data')
-        console.log(data)
-        return data
-      }
-    })
-  // const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/image/upload`, {
-  //   method: 'POST',
-  //   body: file,
+  // .then((response) => {
+  //   return response.text()
   // })
-  // const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/image/upload`, {
-  //   method: 'POST',
-  //   headers: { 'Content-Type': 'multipart/form-data', filename: file.name },
-  //   body: file,
+  // .then((data) => {
+  //   document.getElementById('data').innerHTML += data
   // })
-  // // const formData = new FormData()
-  // // formData.append('file', file)
-  // // // formData.append('upload_preset', 'docs_upload_example_us_preset')
+  // console.log(res)
+  // console.log(res.text())
 
-  // // const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/image/upload`, {
-  // //   method: 'POST',
-  // //   headers: { 'Content-Type': 'multipart/form-data' },
-  // //   body: formData,
-  // // })
-  // // // const res = await fetch(
-  // // //   'https://api.cloudinary.com/v1_1/dw7kpbs2t/image/upload',
-  // // //   {
-  // // //     method: 'POST',
-  // // //     body: formData,
-  // // //   },
-  // // // )
+  if (!res.ok) {
+    throw new Error(`failed to upload image!: ${res}`)
+  }
+  const resJson = await res.json()
+  return { image_id: resJson.public_id, image_url: resJson.secure_url }
+  // console.log(resjson)
+  // return await res.json()
+  // return res
+
+  // const res = await fetch(
+  //   'https://api.cloudinary.com/v1_1/dw7kpbs2t/image/upload',
+  //   {
+  //     method: 'POST',
+  //     // credentials: 'include',
+  //     headers: {
+  //       Authorization: `Bearer ${token}`,
+  //     },
+  //     // credentials: 'omit', // having this in caused a 401
+  //     body: formData,
+  //   },
+  // )
+
+  // const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/image/upload`, {
+  //   method: 'POST',
+  //   // credentials: 'include',
+  //   headers: {
+  //     Authorization: `Bearer ${token}`,
+  //   },
+  //   // credentials: 'omit', // having this in caused a 401
+  //   body: formData,
+  // })
   // if (!res.ok) {
-  //   // throw new Error('failed to upload image!')
-  //   throw new Error(`failed: ${res.error}`)
+  //   throw new Error('failed to upload image!')
   // }
   // return await res.json()
 }

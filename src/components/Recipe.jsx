@@ -13,7 +13,7 @@ export function Recipe({ title, ingredients, image, author: userId }) {
           </Fragment>
         ))}
       </ul>
-      <img src={`${image}`} alt='recipe' />
+      <img src={`${image}`} alt='recipe' width='200' height='200' />
       {userId && (
         <em>
           <br />

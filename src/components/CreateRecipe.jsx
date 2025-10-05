@@ -38,18 +38,36 @@ export function CreateRecipe() {
     setIsSelected(true)
   }
 
-  const setImageConfirmation = (e) => {
+  const setImageConfirmation = async (e) => {
     e.preventDefault()
-    const result = uploadImage(file)
-    console.log('result back from uploadImage in CreateRecipe')
-    console.log(result)
+    const result = await uploadImage(token, file)
+    // console.log('result back from uploadImage in CreateRecipe')
+    // console.log(result)
+    // setIsSelected(false)
     // setIsConfirmed(true)
     setImage(result.image_url)
   }
 
+  const resetStates = () => {
+    // reset vars
+    setTitle('')
+    setIngredients('')
+    setImage('')
+    setFile(new Object())
+    setIsSelected(false)
+  }
+
   const handleSubmit = (e) => {
     e.preventDefault()
+    console.log(image)
+    // // reset vars
+    // setTitle('')
+    // setIngredients('')
+    // setImage('')
+    // setFile(new Object())
+    // setIsSelected(false)
     createRecipeMutation.mutate()
+    resetStates()
   }
 
   if (!token) return <div>Please log in to create new recipes.</div>

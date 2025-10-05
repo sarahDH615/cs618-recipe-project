@@ -1,5 +1,11 @@
-import { Image } from '../db/models/image.js'
 import { cloudinaryConn } from '../middleware/cloudinary.js'
+// import { Image } from '../db/models/image.js'
+// import multer from 'multer'
+
+// Set up Multer for handling file uploads
+// const storage = multer.memoryStorage()
+// const upload = multer({ storage: storage })
+// const multerData = upload.single('image')
 
 // console.log(cloudinaryConn.config()) // temp only
 // example result
@@ -27,27 +33,40 @@ import { cloudinaryConn } from '../middleware/cloudinary.js'
 //   api_key: '267743342695641'
 // }
 
-export async function uploadImage({ image_url }) {
+export async function uploadImage(fileBuffer) {
   // Use the uploaded file's name as the asset's public ID and
   // allow overwriting the asset with new versions
-  const options = {
-    use_filename: true,
-    unique_filename: false,
-    overwrite: true,
-  }
-
+  // const options = {
+  //   use_filename: true,
+  //   unique_filename: false,
+  //   overwrite: true,
+  // }
   try {
     // Upload the image
-    const result = await cloudinaryConn.uploader.upload(image_url, options)
+    // const result = await cloudinaryConn.uploader.upload(image_url, options)
+    const result = await new Promise((resolve, reject) => {
+      cloudinaryConn.uploader
+        .upload_stream((error, uploadResult) => {
+          if (error) {
+            return reject(error)
+          }
+          return resolve(uploadResult)
+        })
+        .end(fileBuffer)
+    })
+    console.log('result in services: ')
     console.log(result)
     // return await result
-    const image = new Image({
-      image_id: result.public_id,
-      image_url: result.secure_url,
-    })
-    return await image.save()
+    // const image = new Image({
+    //   image_id: result.public_id,
+    //   image_url: result.secure_url,
+    // })
+    // return await image.save()
+    return result
   } catch (error) {
+    console.error('Error within services')
     console.error(error)
+    return error
   }
 }
 
