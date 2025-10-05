@@ -2,20 +2,37 @@ import PropTypes from 'prop-types'
 
 export function ImageUploader({
   file,
+  isSelected,
   handleImageSelection,
   handleConfirmFileChoice,
 }) {
+  // name attribute can be passed to multer
   return (
     <div>
       <label htmlFor='add-image'>Image URL: </label>
-      <input
+      {/* <input
         type='file'
         name='add-image'
         id='file'
         onChange={handleImageSelection}
+      /> */}
+      <input
+        type='file'
+        name='image'
+        id='file'
+        accept='image/*'
+        onChange={handleImageSelection}
       />
-      {file && (
+      {file && isSelected && (
         <section>
+          <div>
+            <p>Preview: </p>
+            <img
+              src={URL.createObjectURL(file)}
+              alt='your-upload'
+              height='60'
+            />
+          </div>
           File details:
           <ul>
             <li>Name: {file.name}</li>
@@ -24,7 +41,7 @@ export function ImageUploader({
           </ul>
         </section>
       )}
-      {file && (
+      {file && isSelected && (
         <button type='button' onClick={handleConfirmFileChoice}>
           Confirm image choice
         </button>
@@ -34,6 +51,7 @@ export function ImageUploader({
 }
 ImageUploader.propTypes = {
   file: PropTypes.object,
+  isSelected: PropTypes.bool,
   handleImageSelection: PropTypes.func.isRequired,
   handleConfirmFileChoice: PropTypes.func.isRequired,
 }

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { createRecipe } from '../api/recipes.js'
+import { uploadImage } from '../api/images.js'
 import { useAuth } from '../contexts/AuthContext.jsx'
 import { RecipeTitle } from './RecipeTitle.jsx'
 import { RecipeIngredients } from './RecipeIngredients.jsx'
@@ -11,6 +12,9 @@ export function CreateRecipe() {
   const [ingredients, setIngredients] = useState('')
   const [image, setImage] = useState('')
   const [file, setFile] = useState(new Object())
+  const [isSelected, setIsSelected] = useState(false)
+  // const [isConfirmed, setIsConfirmed] = useState(false)
+  // const [file, setFile] = useState(false)
   const [token] = useAuth()
 
   const queryClient = useQueryClient()
@@ -29,19 +33,22 @@ export function CreateRecipe() {
 
   const updateFileSelection = (e) => {
     console.log(e.target.files[0])
+    // console.log(Object.keys(e.target.files[0]))
     setFile(e.target.files[0])
+    setIsSelected(true)
   }
 
   const setImageConfirmation = (e) => {
     e.preventDefault()
-    console.log(file.name)
-    // do some sort of upload function here and set that output to be the image
-    setImage(file.name)
+    const result = uploadImage(file)
+    console.log('result back from uploadImage in CreateRecipe')
+    console.log(result)
+    // setIsConfirmed(true)
+    setImage(result.image_url)
   }
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    console.log(ingredients)
     createRecipeMutation.mutate()
   }
 
@@ -49,6 +56,12 @@ export function CreateRecipe() {
 
   //   e.preventDefault prevents page refresh when a form is submitted
   // prevent the submit button from clicking when there's no title or a post is pending
+  // <form
+  //   method='POST'
+  //   action='/image/upload'
+  //   encType='multipart/form-data'
+  //   onSubmit={handleSubmit}
+  // >
   return (
     <form name='recipe' onSubmit={handleSubmit}>
       <RecipeTitle title={title} handleTitleChange={updateTitle} />
@@ -58,6 +71,7 @@ export function CreateRecipe() {
       />
       <ImageUploader
         file={file}
+        isSelected={isSelected}
         handleImageSelection={updateFileSelection}
         handleConfirmFileChoice={setImageConfirmation}
       />

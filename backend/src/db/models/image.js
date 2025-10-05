@@ -1,7 +1,7 @@
 import mongoose, { Schema } from 'mongoose'
 
 const imageSchema = new Schema({
-  filename: { type: String, required: true },
-  filecontents: { type: File, required: true },
+  image_id: { type: String, required: true },
+  image_url: { type: String, required: true },
 })
 export const Image = mongoose.model('image', imageSchema)
