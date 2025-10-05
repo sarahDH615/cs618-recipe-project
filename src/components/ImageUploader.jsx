@@ -9,7 +9,6 @@ export function ImageUploader({ file, isSelected, handleImageSelection }) {
         type='file'
         name='image'
         id='file'
-        value=''
         accept='image/*'
         onChange={handleImageSelection}
       />
