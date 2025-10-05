@@ -5,7 +5,7 @@ const recipeSchema = new Schema(
     title: { type: String, required: true },
     author: { type: Schema.Types.ObjectId, ref: 'user', required: true },
     ingredients: [String],
-    image: { type: String, ref: 'image' },
+    image: { type: String },
   },
   { timestamps: true }, // add timestamps to each entry
 )

@@ -13,8 +13,7 @@ export function CreateRecipe() {
   const [image, setImage] = useState('')
   const [file, setFile] = useState(new Object())
   const [isSelected, setIsSelected] = useState(false)
-  // const [isConfirmed, setIsConfirmed] = useState(false)
-  // const [file, setFile] = useState(false)
+  const [isConfirmed, setIsConfirmed] = useState(false)
   const [token] = useAuth()
 
   const queryClient = useQueryClient()
@@ -33,60 +32,42 @@ export function CreateRecipe() {
 
   const updateFileSelection = async (e) => {
     console.log(e.target.files[0])
-    // console.log(Object.keys(e.target.files[0]))
     setFile(e.target.files[0])
     setIsSelected(true)
     const result = await uploadImage(token, e.target.files[0])
     console.log('result back from uploadImage in CreateRecipe')
-    // console.log(result)
     console.log(`title: ${title}`)
     console.log(`ingredients: ${ingredients}`)
     console.log(`image: ${result.image_url}`)
-    // setIsSelected(false)
-    // setIsConfirmed(true)
     setImage(result.image_url)
+    setIsConfirmed(true)
+    console.log(`is confirmed?: ${isConfirmed}`)
   }
 
-  const setImageConfirmation = async () => {
-    // e.preventDefault()
-    // console.log('button clicked, waiting for response...')
-    // const result = await uploadImage(token, file)
-    // console.log('result back from uploadImage in CreateRecipe')
-    // console.log(result)
-    // // setIsSelected(false)
-    // // setIsConfirmed(true)
-    // setImage(result.image_url)
-    console.log('click')
+  const resetStates = () => {
+    // reset vars
+    setTitle('')
+    setIngredients('')
+    setImage('')
+    setFile(new Object())
+    setIsSelected(false)
+    setIsConfirmed(false)
   }
-
-  // const resetStates = () => {
-  //   // reset vars
-  //   setTitle('')
-  //   setIngredients('')
-  //   setImage('')
-  //   setFile(new Object())
-  //   setIsSelected(false)
-  // }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    // setImage(result.image_url)
     createRecipeMutation.mutate()
-    // resetStates()
   }
 
   if (!token) return <div>Please log in to create new recipes.</div>
 
   //   e.preventDefault prevents page refresh when a form is submitted
   // prevent the submit button from clicking when there's no title or a post is pending
-  // <form
-  //   method='POST'
-  //   action='/image/upload'
-  //   encType='multipart/form-data'
-  //   onSubmit={handleSubmit}
-  // >
   return (
     <form name='recipe' onSubmit={handleSubmit}>
+      <button type='button' id='clear-fields' onClick={resetStates}>
+        Clear fields
+      </button>
       <RecipeTitle title={title} handleTitleChange={updateTitle} />
       <RecipeIngredients
         ingredients={ingredients}
@@ -96,17 +77,14 @@ export function CreateRecipe() {
         file={file}
         isSelected={isSelected}
         handleImageSelection={updateFileSelection}
-        handleConfirmFileChoice={setImageConfirmation}
       />
-      <br />
-      <br />
       <input
         type='submit'
         value={createRecipeMutation.isPending ? 'Creating...' : 'Create'}
-        disabled={!title || createRecipeMutation.isPending}
+        disabled={!title || !isConfirmed || createRecipeMutation.isPending}
       />
 
-      {createRecipeMutation.isSuccess ? (
+      {createRecipeMutation.isSuccess && title ? (
         <>
           <br />
           Post successfully created!

@@ -9,10 +9,13 @@ export function Header() {
     const { sub } = jwtDecode(token) // decode to get the payload
     return (
       <div>
-        <p>
+        <span>
           Logged in as <User id={sub} />
-        </p>
-        <button onClick={() => setToken(null)}>Log Out</button>
+        </span>
+        <button id='logout' onClick={() => setToken(null)}>
+          Log Out
+        </button>
+        <hr />
       </div>
     )
   }

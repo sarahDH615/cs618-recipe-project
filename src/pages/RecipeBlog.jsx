@@ -23,8 +23,6 @@ export function RecipeBlog() {
     <div style={{ padding: 8 }}>
       <Header />
       <CreateRecipe />
-      <br />
-      <br />
       Filter by:
       <RecipeFilter
         field='author'
