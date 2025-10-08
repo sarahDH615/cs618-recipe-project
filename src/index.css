@@ -67,7 +67,7 @@ button:focus-visible {
   button {
     background-color: #280404;
   }
-  #logout {
+  #logout, #edit, #delete {
     margin-left: 1.2em;
   }
   #clear-fields {

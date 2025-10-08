@@ -1,6 +1,11 @@
 import PropTypes from 'prop-types'
 
-export function ImageUploader({ file, isSelected, handleImageSelection }) {
+export function ImageUploader({
+  file,
+  isSelected,
+  handleImageSelection,
+  handleImageRemoval,
+}) {
   // name attribute can be passed to multer
   return (
     <div>
@@ -28,6 +33,9 @@ export function ImageUploader({ file, isSelected, handleImageSelection }) {
             <li>Type: {file.type}</li>
             <li>Size: {file.size} bytes</li>
           </ul>
+          <button type='button' onClick={handleImageRemoval}>
+            Remove image?
+          </button>
         </section>
       )}
     </div>
@@ -38,4 +46,5 @@ ImageUploader.propTypes = {
   file: PropTypes.object,
   isSelected: PropTypes.bool,
   handleImageSelection: PropTypes.func.isRequired,
+  handleImageRemoval: PropTypes.func.isRequired,
 }

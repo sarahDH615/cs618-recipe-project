@@ -15,6 +15,7 @@ export function CreateRecipe() {
   const [isSelected, setIsSelected] = useState(false)
   const [isConfirmed, setIsConfirmed] = useState(false)
   const [token] = useAuth()
+  const [imageUploaderKey, setImageUploaderKey] = useState(1)
 
   const queryClient = useQueryClient()
   const createRecipeMutation = useMutation({
@@ -28,6 +29,12 @@ export function CreateRecipe() {
 
   const updateIngredients = (e) => {
     setIngredients(e.target.value)
+  }
+
+  const removeSelectedImage = () => {
+    setFile(new Object())
+    setImage('')
+    setIsSelected(false)
   }
 
   const updateFileSelection = async (e) => {
@@ -44,7 +51,7 @@ export function CreateRecipe() {
     console.log(`is confirmed?: ${isConfirmed}`)
   }
 
-  const resetStates = () => {
+  const resetStates = async () => {
     // reset vars
     setTitle('')
     setIngredients('')
@@ -52,6 +59,7 @@ export function CreateRecipe() {
     setFile(new Object())
     setIsSelected(false)
     setIsConfirmed(false)
+    setImageUploaderKey(Math.abs(imageUploaderKey - 1)) // re-render so that fields reset
   }
 
   const handleSubmit = async (e) => {
@@ -74,14 +82,20 @@ export function CreateRecipe() {
         handleIngredientsChange={updateIngredients}
       />
       <ImageUploader
+        key={imageUploaderKey}
         file={file}
         isSelected={isSelected}
         handleImageSelection={updateFileSelection}
+        handleImageRemoval={removeSelectedImage}
       />
       <input
         type='submit'
         value={createRecipeMutation.isPending ? 'Creating...' : 'Create'}
-        disabled={!title || !isConfirmed || createRecipeMutation.isPending}
+        disabled={
+          !title ||
+          (!isConfirmed && isSelected) ||
+          createRecipeMutation.isPending
+        }
       />
 
       {createRecipeMutation.isSuccess && title ? (
