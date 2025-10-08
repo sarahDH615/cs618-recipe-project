@@ -22,6 +22,22 @@ export const deleteRecipe = async (token, id) => {
   return await res.json()
 }
 
+export const updateRecipe = async (token, recipe) => {
+  recipe.ingredients = recipe.ingredients.split('\n')
+  const res = await fetch(
+    `${import.meta.env.VITE_BACKEND_URL}/recipes/${recipe.id}`,
+    {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(recipe),
+    },
+  )
+  return await res.json()
+}
+
 export const createRecipe = async (token, recipe) => {
   recipe.ingredients = recipe.ingredients.split('\n')
   const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/recipes`, {
