@@ -14,6 +14,6 @@ export function Modal({ children, onClose }) {
 }
 
 Modal.propTypes = {
-  children: PropTypes.arrayOf(PropTypes.element),
+  children: PropTypes.element,
   onClose: PropTypes.func,
 }

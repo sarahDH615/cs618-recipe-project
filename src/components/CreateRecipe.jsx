@@ -6,6 +6,7 @@ import { useAuth } from '../contexts/AuthContext.jsx'
 import { RecipeTitle } from './RecipeTitle.jsx'
 import { RecipeIngredients } from './RecipeIngredients.jsx'
 import { ImageUploader } from './ImageUploader.jsx'
+import { Modal } from '../components/Modal.jsx'
 
 export function CreateRecipe() {
   const [title, setTitle] = useState('') // default: ''
@@ -16,6 +17,7 @@ export function CreateRecipe() {
   const [isConfirmed, setIsConfirmed] = useState(false)
   const [token] = useAuth()
   const [imageUploaderKey, setImageUploaderKey] = useState(1)
+  const [modalDismissed, setModalDismissed] = useState(false)
 
   const queryClient = useQueryClient()
   const createRecipeMutation = useMutation({
@@ -98,11 +100,10 @@ export function CreateRecipe() {
         }
       />
 
-      {createRecipeMutation.isSuccess && title ? (
-        <>
-          <br />
-          Post successfully created!
-        </>
+      {createRecipeMutation.isSuccess && !modalDismissed && title ? (
+        <Modal onClose={() => setModalDismissed(true)}>
+          <p>Post successfully created!</p>
+        </Modal>
       ) : null}
     </form>
   )

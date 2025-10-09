@@ -86,9 +86,6 @@ export function EditRecipe({
         handleImageSelection={updateFileSelection}
         handleImageRemoval={removeSelectedImage}
       />
-      {/* <button type='button' onClick={handleEditSubmit}>
-        Update Recipe
-      </button> */}
       <button
         type='submit'
         value={editRecipeMutation.isPending ? 'Updating...' : 'Update Recipe'}

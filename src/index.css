@@ -4,7 +4,6 @@
   font-weight: 400;
 
   color-scheme: dark light;
-  /* color: rgba(255, 255, 255, 0.87); */
   color: #213547;
   background-color: #242424;
 
@@ -58,7 +57,7 @@ button:focus-visible {
 
 @media (prefers-color-scheme: dark) {
   :root {
-    color: rgba(127, 255, 212, 0.525);
+    color: #37b5ab;
     background-color: #0b0b0b;
   }
   a:hover {
@@ -87,31 +86,46 @@ button:focus-visible {
     float: left;
   } */
   #overlay {
-    position: 'fixed';
+    position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: 'rgba(0, 0, 0, 0.7)';
-    display: 'flex';
-    align-items: 'center';
-    justify-content: 'center';
+    background-color: #958e8ebc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   #modal {
-    background-color: 'white';
-    padding: '20px';
-    border-radius: '8px';
-    position: 'relative';
-    width: '80%';
-    max-width: '500px';
+    background-color: #26db935b;
+    padding: 8px;
+    border-radius: 8px;
+    /* position: fixed; */
+    position: relative;
+    width: 20%;
+    max-width: 95%;
+    height: 30%;
+    max-height: 80%;
+    /* display: flex; */
+    /* text-align: center; */
+  }
+  #modal>*:not(#modal-close-button) {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
   }
   #modal-close-button {
-    position: 'absolute';
-    top: '10px';
-    right: '10px';
-    background: 'transparent';
-    border: 'none';
-    font-size: '18px';
-    cursor: 'pointer'
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: transparent;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  #confirm-delete {
+    margin-left: 1.2em;
+    margin-top: 1.2em;
   }
 }
