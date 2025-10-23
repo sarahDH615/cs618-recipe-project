@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://special-xylophone-g6jpv5pgj7q2vp4v-3000.app.github.dev/sitemap.xml

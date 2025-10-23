@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/react-query'
 import { getRecipes } from '../api/recipes.js'
 import { useState } from 'react'
 import { Header } from '../components/Header.jsx'
+import { Helmet } from 'react-helmet-async'
 
 export function RecipeBlog() {
   const [author, setAuthor] = useState('') // default: ''
@@ -21,6 +22,10 @@ export function RecipeBlog() {
   const recipes = recipesQuery.data ?? [] // get data from the query
   return (
     <div style={{ padding: 8 }}>
+      <Helmet>
+        <title>Recipe Blog</title>
+        <meta name='description' content='A blog for recipes.' />
+      </Helmet>
       <Header />
       <CreateRecipe />
       Filter by:

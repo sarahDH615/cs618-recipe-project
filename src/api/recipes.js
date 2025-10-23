@@ -6,6 +6,13 @@ export const getRecipes = async (queryParams) => {
   return await res.json()
 }
 
+export const getRecipeById = async (recipeId) => {
+  const res = await fetch(
+    `${import.meta.env.VITE_BACKEND_URL}/recipes/${recipeId}`,
+  )
+  return await res.json()
+}
+
 export const deleteRecipe = async (token, id) => {
   console.log(
     `delete endpoint: ${import.meta.env.VITE_BACKEND_URL}/recipes/${id}`,

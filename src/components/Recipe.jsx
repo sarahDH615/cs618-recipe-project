@@ -6,12 +6,27 @@ import { useAuth } from '../contexts/AuthContext.jsx'
 import { EditRecipe } from './EditRecipe.jsx'
 import { DeleteRecipe } from './DeleteRecipe.jsx'
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
+import slug from 'slug'
 
-export function Recipe({ _id, title, ingredients, image, author: userId }) {
+// export function Recipe({ title, ingredients, image, author, id, authorId, fullRecipe = false }) {
+export function Recipe({
+  title,
+  ingredients,
+  image,
+  author,
+  _id,
+  fullRecipe = false,
+}) {
   const [token] = useAuth()
   const [statusIsEdit, setStatusIsEdit] = useState(false)
   const [statusIsDelete, setStatusIsDelete] = useState(false)
   const { sub } = token ? jwtDecode(token) : { sub: '' } // decode to get the payload if logged in
+  // const authorIsUser = sub == authorId
+  const authorIsUser = sub == author
+  // need to add in like counts
+  // need to store whether the user has liked this post -- store on user or on post? probably user
+  // like count should be stored on post, or a separate table
 
   const handleDeleteRequest = async () => {
     console.log(`Delete request for post id ${_id}`)
@@ -35,29 +50,37 @@ export function Recipe({ _id, title, ingredients, image, author: userId }) {
 
   return (
     <article>
-      <h3>{title}</h3>
-      <div className='ingredient-list'>
-        <ul>
-          {ingredients.map((i) => (
-            <Fragment key={ingredients.indexOf(i)}>
-              <li>{i}</li>
-            </Fragment>
-          ))}
-        </ul>
-      </div>
-      {image && (
+      {fullRecipe ? (
+        <h3>{title}</h3>
+      ) : (
+        <Link to={`/recipes/${_id}/${slug(title)}`}>
+          <h3>{title}</h3>
+        </Link>
+      )}
+      {fullRecipe && (
+        <div className='ingredient-list'>
+          <ul>
+            {ingredients.map((i) => (
+              <Fragment key={ingredients.indexOf(i)}>
+                <li>{i}</li>
+              </Fragment>
+            ))}
+          </ul>
+        </div>
+      )}
+      {fullRecipe && image && (
         <div>
           <img className='recipe-image' src={`${image}`} alt='recipe' />
         </div>
       )}
-      {userId && (
+      {author && (
         <em>
-          <br />
-          <br />
-          Written by <User id={userId} />
+          {/* Written by <User {...author} /> */}
+          Written by <User id={author} />
         </em>
       )}
-      {userId && userId === sub && (
+      {/* userId == sub */}
+      {fullRecipe && authorIsUser && (
         <>
           <br />
           <br />
@@ -79,7 +102,7 @@ export function Recipe({ _id, title, ingredients, image, author: userId }) {
           </button>
         </>
       )}
-      {statusIsEdit && (
+      {fullRecipe && statusIsEdit && (
         <EditRecipe
           id={_id}
           title={title}
@@ -90,7 +113,7 @@ export function Recipe({ _id, title, ingredients, image, author: userId }) {
           handleCompleteSubmit={handleEditSubmission}
         />
       )}
-      {statusIsDelete && (
+      {fullRecipe && statusIsDelete && (
         <DeleteRecipe
           id={_id}
           token={token}
@@ -107,4 +130,5 @@ Recipe.propTypes = {
   ingredients: PropTypes.arrayOf(PropTypes.string),
   image: PropTypes.string,
   author: PropTypes.string,
+  fullRecipe: PropTypes.bool,
 }
