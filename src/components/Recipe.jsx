@@ -152,11 +152,18 @@ export function Recipe({
       )}
       {fullRecipe && token && (
         <button type='button' onClick={handleLikeClick}>
-          {isLiked === true ? 'Unlike' : 'Like'}
+          {isLiked ? 'Unlike' : 'Like'}
         </button>
       )}
+      {fullRecipe && !token && (
+        <div>
+          <Link to='/login'>Log In</Link> to like this recipe!
+        </div>
+      )}
       <div>
-        <p>{likes} people liked this recipe.</p>
+        <p>
+          {likes} {likes == 1 ? 'person' : 'people'} liked this recipe.
+        </p>
       </div>
     </article>
   )

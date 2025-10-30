@@ -6,7 +6,7 @@ const recipeSchema = new Schema(
     author: { type: Schema.Types.ObjectId, ref: 'user', required: true },
     ingredients: [String],
     image: { type: String },
-    likeCount: { type: Number },
+    likeCount: { type: Number, default: 0 }, // upon creation, zero likes
   },
   { timestamps: true }, // add timestamps to each entry
 )
