@@ -98,6 +98,8 @@ export function Recipe({
     console.log(`event target value: ${e.target.value}`)
     console.log(`like status upon click: ${isLiked}`)
     console.log(`Likes count: ${likes}`)
+    // saved to variable so that it can be used,
+    // see https://react.dev/reference/react/useState#ive-updated-the-state-but-logging-gives-me-the-old-value
     let opposite = !isLiked
     console.log(`opposite of is liked: ${opposite}`)
     setIsLiked(opposite)
