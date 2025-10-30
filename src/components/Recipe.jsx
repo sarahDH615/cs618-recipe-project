@@ -5,10 +5,11 @@ import { jwtDecode } from 'jwt-decode'
 import { useAuth } from '../contexts/AuthContext.jsx'
 import { EditRecipe } from './EditRecipe.jsx'
 import { DeleteRecipe } from './DeleteRecipe.jsx'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import slug from 'slug'
-import { checkIfLiked } from '../api/likes.js'
+import { checkIfLiked, updateLike } from '../api/likes.js'
+import { useQuery, useMutation } from '@tanstack/react-query'
 // import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 // export function Recipe({ title, ingredients, image, author, id, authorId, fullRecipe = false }) {
@@ -22,22 +23,48 @@ export function Recipe({
   fullRecipe = false,
 }) {
   const [token] = useAuth()
-  const likesToDisplay = likeCount === undefined ? 0 : likeCount
-  console.log(`display likes: ${likesToDisplay}`)
   const [statusIsEdit, setStatusIsEdit] = useState(false)
   const [statusIsDelete, setStatusIsDelete] = useState(false)
   const { sub } = token ? jwtDecode(token) : { sub: '' } // decode to get the payload if logged in
   // const authorIsUser = sub == authorId
   const authorIsUser = sub == author
-  const cilRes = checkIfLiked(_id, sub)
-  if (token) {
-    console.log(`check if liked result: ${cilRes}`)
-  }
-  // const likedStatus = token ? checkIfLiked(_id, sub) : false
-  const likedStatus = token ? cilRes : false
-  console.log(`liked status: ${likedStatus}`)
+  const userLikesRecipeQuery = useQuery({
+    queryKey: ['like', { _id, sub }], // the endpoint it reads and the params it passes to it
+    queryFn: () => checkIfLiked(_id, sub), // the function it calls to read the endpoint
+  })
+  const initialLikedStatus = userLikesRecipeQuery.data ?? false
+  console.log(`initial liked status: ${initialLikedStatus}`)
   const [likes, setLikes] = useState(likeCount)
-  const [isLiked, setIsLiked] = useState(likedStatus)
+  const [isLiked, setIsLiked] = useState(initialLikedStatus)
+  // if  likes have changed since last page re-load, update the recipe with the new title
+  // and add/remove the like
+  const updateLikeMutation = useMutation({
+    mutationFn: (action) => updateLike({ _id, sub, action }),
+    onSuccess: (data) => data,
+  })
+
+  useEffect(() => {
+    // -- SETUP FUNCTION
+    // set 1 second wait, after which the mutation function will run
+    let timeout = setTimeout(() => {
+      // trackEventMutation.mutate('startView')
+      timeout = null
+    }, 1000)
+    // --
+    // CLEANUP FUNCTION : ie, when user leaves the page
+    return () => {
+      if (timeout) {
+        clearTimeout(timeout)
+      } else {
+        console.log(`is liked: ${isLiked}`)
+        console.log(`was liked initially: ${initialLikedStatus}`)
+        let act = isLiked && !initialLikedStatus ? 'add' : 'remove'
+        console.log(`act: ${act}`)
+        updateLikeMutation.mutate(act)
+      }
+    }
+    // --
+  }, [isLiked]) // dependencies: when isLiked changes
   // const queryClient = useQueryClient()
   // const editLikeMutation = useMutation({
   //   mutationFn: () => createRecipe(token, { title, ingredients, image, likes }),
@@ -67,10 +94,20 @@ export function Recipe({
     setStatusIsEdit(false)
   }
 
-  const handleLikeClick = () => {
+  const handleLikeClick = (e) => {
+    console.log(`event target value: ${e.target.value}`)
+    console.log(`like status upon click: ${isLiked}`)
     console.log(`Likes count: ${likes}`)
-    setIsLiked(!isLiked)
-    if (isLiked) {
+    let opposite = !isLiked
+    console.log(`opposite of is liked: ${opposite}`)
+    setIsLiked(opposite)
+    console.log(`like status after switch: ${isLiked}`)
+    // if (isLiked) {
+    //   setLikes(likes + 1)
+    // } else {
+    //   setLikes(likes - 1)
+    // }
+    if (opposite) {
       setLikes(likes + 1)
     } else {
       setLikes(likes - 1)
@@ -157,7 +194,9 @@ export function Recipe({
       )}
       {fullRecipe && !token && (
         <div>
-          <Link to='/login'>Log In</Link> to like this recipe!
+          <p>
+            <Link to='/login'>Log In</Link> to like this recipe!
+          </p>
         </div>
       )}
       <div>

@@ -65,7 +65,7 @@ export function ViewRecipe({ recipeId }) {
     queryFn: () => getRecipeById(recipeId),
   })
   const recipe = recipeQuery.data
-  console.log(recipe)
+  // console.log(recipe)
   const userInfoQuery = useQuery({
     queryKey: ['users', recipe?.author],
     queryFn: () => getUserInfo(recipe?.author),

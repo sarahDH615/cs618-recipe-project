@@ -12,9 +12,20 @@ export const checkIfLiked = async (id, userid) => {
     `${import.meta.env.VITE_BACKEND_URL}/likes/${id}/${userid}`,
   )
   const isLiked = await res.json()
-  console.log(`is liked: ${Boolean(isLiked)}`)
+  // console.log(`is liked: ${Boolean(isLiked)}`)
   return Boolean(isLiked)
   // return await res.json()
+}
+
+export const updateLike = async (id, userid, action) => {
+  let result
+  if (action == 'add') {
+    result = addLike(userid, id)
+  } else {
+    result = removeLike(userid, id)
+  }
+  console.log(`update like result: ${result}`)
+  return result
 }
 
 export const removeLike = async (token, id) => {
