@@ -10,6 +10,7 @@ import {
 import { getUserInfo } from './api/users.js'
 import { ViewRecipe } from './pages/ViewRecipe.jsx'
 import { getRecipes, getRecipeById } from './api/recipes.js'
+import { getLikes } from './api/likes.js'
 // import slug from 'slug'
 
 export const routes = [
@@ -20,18 +21,25 @@ export const routes = [
       const author = ''
       const sortBy = 'createdAt'
       const sortOrder = 'descending'
-      const posts = await getRecipes({ author, sortBy, sortOrder })
+      const recipes = await getRecipes({ author, sortBy, sortOrder })
       await queryClient.prefetchQuery({
-        queryKey: ['posts', { author, sortBy, sortOrder }],
-        queryFn: () => posts,
+        queryKey: ['recipes', { author, sortBy, sortOrder }],
+        queryFn: () => recipes,
       })
-      const uniqueAuthors = posts
-        .map((post) => post.author)
+      const uniqueAuthors = recipes
+        .map((recipe) => recipe.author)
         .filter((value, index, array) => array.indexOf(value) === index)
       for (const userId of uniqueAuthors) {
         await queryClient.prefetchQuery({
           queryKey: ['users', userId],
           queryFn: () => getUserInfo(userId),
+        })
+      }
+      // get likes count
+      for (const recipe of recipes) {
+        await queryClient.prefetchQuery({
+          queryKey: ['likes', recipe._id],
+          queryFn: () => getLikes(recipe._id),
         })
       }
       return dehydrate(queryClient)
@@ -60,16 +68,23 @@ export const routes = [
       const recipeId = params.recipeId
       const queryClient = new QueryClient()
       const recipe = await getRecipeById(recipeId)
+      // cache data from the recipe
       await queryClient.prefetchQuery({
         queryKey: ['recipe', recipeId],
         queryFn: () => recipe,
       })
+      // cache author info for the recipe
       if (recipe?.author) {
         await queryClient.prefetchQuery({
           queryKey: ['users', recipe.author],
           queryFn: () => getUserInfo(recipe.author),
         })
       }
+      // get likes count for the recipe
+      await queryClient.prefetchQuery({
+        queryKey: ['likes', recipe._id],
+        queryFn: () => getLikes(recipe._id),
+      })
       return { dehydratedState: dehydrate(queryClient), recipeId }
     },
     Component() {

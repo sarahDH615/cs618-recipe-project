@@ -1,6 +1,7 @@
 import express from 'express'
 import { recipesRoutes } from './routes/recipes.js'
 import { userRoutes } from './routes/users.js'
+import { likesRoutes } from './routes/likes.js'
 import bodyParser from 'body-parser'
 import cors from 'cors'
 
@@ -11,6 +12,7 @@ app.use(bodyParser.json()) // intercepts the requests and converts them to json
 app.use(bodyParser.urlencoded({ extended: true }))
 recipesRoutes(app) // call recipesRoutes with express instance as param
 userRoutes(app)
+likesRoutes(app)
 
 // default route
 app.get('/', (req, res) => {

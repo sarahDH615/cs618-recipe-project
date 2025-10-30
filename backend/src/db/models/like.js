@@ -1,12 +1,9 @@
 import mongoose, { Schema } from 'mongoose'
 // create schema
-const recipeSchema = new Schema(
+const likeSchema = new Schema(
   {
-    title: { type: String, required: true },
-    author: { type: Schema.Types.ObjectId, ref: 'user', required: true },
-    ingredients: [String],
-    image: { type: String },
-    likeCount: { type: Number },
+    post: { type: Schema.Types.ObjectId, ref: 'post', required: true }, // id of the post
+    user: { type: Schema.Types.ObjectId, ref: 'user', required: true },
   },
   { timestamps: true }, // add timestamps to each entry
 )
@@ -14,4 +11,4 @@ const recipeSchema = new Schema(
 // arg 0: the singular of the name of the collection
 // arg 2: schema to build the model from
 // export to allow use anywhere in the project
-export const Recipe = mongoose.model('recipe', recipeSchema)
+export const Like = mongoose.model('like', likeSchema)
