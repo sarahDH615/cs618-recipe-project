@@ -130,3 +130,50 @@ button:focus-visible {
     margin-top: 1.2em;
   }
 }
+.like-btn {
+  background-color: #0b0b0b;
+  cursor: default;
+  padding: 0.6em 0.2em;
+  margin-left: 0.2em;
+}
+
+.like-btn:hover {
+  border-color: #0b0b0b; /* remove border hover */
+}
+
+.like-btn i {
+    transition: color 0.3s ease;
+}
+
+/* already liked */
+.like-btn.liked i {
+    cursor: pointer;
+    color: #2b6a97;
+}
+/* capable of being liked */
+.like-btn.enabled i {
+    cursor: pointer;
+    color: #2b6a976c;
+}
+/* can't be liked */
+.like-btn.inactive i {
+    color: #7e8c98;
+    position: relative;
+}
+.like-btn.inactive:hover .like-btn-hover-text {
+    display: block;
+}
+/* text to display on hover if not logged in */
+.like-btn-hover-text {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: max-content;
+    display: none;
+    background-color: #f9f9f900;
+    /* padding: 10px; */
+    z-index: 1;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+
+

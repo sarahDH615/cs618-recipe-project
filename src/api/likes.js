@@ -17,12 +17,13 @@ export const checkIfLiked = async (id, userid) => {
   // return await res.json()
 }
 
-export const updateLike = async (id, userid, action) => {
+export const updateLike = async (id, token, action) => {
+  // console.log(`id: ${id}, token: ${token}, action: ${action}`)
   let result
   if (action == 'add') {
-    result = addLike(userid, id)
+    result = await addLike(token, id)
   } else {
-    result = removeLike(userid, id)
+    result = await removeLike(token, id)
   }
   console.log(`update like result: ${result}`)
   return result

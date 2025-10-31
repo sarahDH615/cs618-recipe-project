@@ -4,6 +4,7 @@ import { RecipeFilter } from '../components/RecipeFilter.jsx'
 import { RecipeSorting } from '../components/RecipeSorting.jsx'
 import { useQuery } from '@tanstack/react-query'
 import { getRecipes } from '../api/recipes.js'
+import { getLikes } from './api/likes.js'
 import { useState } from 'react'
 import { Header } from '../components/Header.jsx'
 import { Helmet } from 'react-helmet-async'
@@ -20,6 +21,17 @@ export function RecipeBlog() {
   })
 
   const recipes = recipesQuery.data ?? [] // get data from the query
+  for (const recipe of recipes) {
+    const totalLikes = useQuery({
+      queryKey: ['likes', recipe._id],
+      queryFn: () => getLikes(recipe._id),
+    })
+    const tlData = totalLikes.data ?? false
+    console.log(`total likes for recipe ${recipe._id}: ${tlData}`)
+    if (tlData) {
+      recipe.likeCount = tlData
+    }
+  }
   return (
     <div style={{ padding: 8 }}>
       <Helmet>

@@ -80,11 +80,11 @@ export const routes = [
           queryFn: () => getUserInfo(recipe.author),
         })
       }
-      // get likes count for the recipe
-      await queryClient.prefetchQuery({
-        queryKey: ['likes', recipe._id],
-        queryFn: () => getLikes(recipe._id),
-      })
+      // // get likes count for the recipe
+      // await queryClient.prefetchQuery({
+      //   queryKey: ['likes', recipe._id],
+      //   queryFn: () => getLikes(recipe._id),
+      // })
       return { dehydratedState: dehydrate(queryClient), recipeId }
     },
     Component() {

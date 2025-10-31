@@ -5,12 +5,15 @@ import { jwtDecode } from 'jwt-decode'
 import { useAuth } from '../contexts/AuthContext.jsx'
 import { EditRecipe } from './EditRecipe.jsx'
 import { DeleteRecipe } from './DeleteRecipe.jsx'
-import { useEffect, useState } from 'react'
+// import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import slug from 'slug'
 import { checkIfLiked, updateLike } from '../api/likes.js'
+// import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useQuery, useMutation } from '@tanstack/react-query'
 // import { useMutation, useQueryClient } from '@tanstack/react-query'
+// import { updateRecipe } from './api/recipes.js'
 
 // export function Recipe({ title, ingredients, image, author, id, authorId, fullRecipe = false }) {
 export function Recipe({
@@ -36,35 +39,46 @@ export function Recipe({
   console.log(`initial liked status: ${initialLikedStatus}`)
   const [likes, setLikes] = useState(likeCount)
   const [isLiked, setIsLiked] = useState(initialLikedStatus)
+
+  // const queryClient = useQueryClient()
   // if  likes have changed since last page re-load, update the recipe with the new title
   // and add/remove the like
+  // const updateLikeMutation = useMutation({
+  //   mutationFn: async (action) => updateLike( _id, token, action ),
+  //   onSuccess: queryClient.invalidateQueries(['recipes']),
+  // })
+  // const updateLikeMutation = useMutation({
+  //   mutationFn: async (action) => await updateLike( _id, token, action ),
+  //   onSuccess: () => updateCountMutation.mutate(),
+  // })
   const updateLikeMutation = useMutation({
-    mutationFn: (action) => updateLike({ _id, sub, action }),
+    mutationFn: (action) => updateLike(_id, token, action),
     onSuccess: (data) => data,
   })
 
-  useEffect(() => {
-    // -- SETUP FUNCTION
-    // set 1 second wait, after which the mutation function will run
-    let timeout = setTimeout(() => {
-      // trackEventMutation.mutate('startView')
-      timeout = null
-    }, 1000)
-    // --
-    // CLEANUP FUNCTION : ie, when user leaves the page
-    return () => {
-      if (timeout) {
-        clearTimeout(timeout)
-      } else {
-        console.log(`is liked: ${isLiked}`)
-        console.log(`was liked initially: ${initialLikedStatus}`)
-        let act = isLiked && !initialLikedStatus ? 'add' : 'remove'
-        console.log(`act: ${act}`)
-        updateLikeMutation.mutate(act)
-      }
-    }
-    // --
-  }, [isLiked]) // dependencies: when isLiked changes
+  // const updateCountMutation = useMutation({
+  //   mutationFn: () => updateRecipe(token, { title, ingredients, image, likeCount: likes }),
+  //   onSuccess: queryClient.invalidateQueries(['recipes']),
+  // })
+
+  // useEffect(() => {
+  //   // -- SETUP FUNCTION
+  //   // set 1 second wait, after which the mutation function will run
+  //   let timeout = setTimeout(() => {
+  //     timeout = null
+  //   }, 1000)
+  //   // --
+  //   // CLEANUP FUNCTION : ie, when user leaves the page
+  //   return () => {
+  //     if (timeout) {
+  //       clearTimeout(timeout)
+  //     } else {
+  //       console.log(`updating recipe to show ${likes} likes`)
+  //       updateCountMutation.mutate()
+  //     }
+  //   }
+  //   // --
+  // }, [likes]) // dependencies: when isLiked changes
   // const queryClient = useQueryClient()
   // const editLikeMutation = useMutation({
   //   mutationFn: () => createRecipe(token, { title, ingredients, image, likes }),
@@ -94,28 +108,46 @@ export function Recipe({
     setStatusIsEdit(false)
   }
 
-  const handleLikeClick = (e) => {
-    console.log(`event target value: ${e.target.value}`)
-    console.log(`like status upon click: ${isLiked}`)
-    console.log(`Likes count: ${likes}`)
+  const handleLikeClick = () => {
     // saved to variable so that it can be used,
     // see https://react.dev/reference/react/useState#ive-updated-the-state-but-logging-gives-me-the-old-value
     let opposite = !isLiked
     console.log(`opposite of is liked: ${opposite}`)
     setIsLiked(opposite)
-    console.log(`like status after switch: ${isLiked}`)
-    // if (isLiked) {
-    //   setLikes(likes + 1)
-    // } else {
-    //   setLikes(likes - 1)
-    // }
     if (opposite) {
       setLikes(likes + 1)
+      updateLikeMutation.mutate('add')
     } else {
       setLikes(likes - 1)
+      updateLikeMutation.mutate('remove')
     }
     console.log(`Updated likes count: ${likes}`)
   }
+
+  // const likedButtonClass = () => {
+  //   if(fullRecipe){
+  //     if(token){
+  //       // logged in on full recipe page
+  //       if(isLiked){
+  //         return 'like-btn liked'
+  //       }
+  //       else { return 'like-btn enabled' }
+  //     }
+  //   }
+  //   // on summary page
+  //   else{
+  //     // logged in: show liked status and text popup
+  //     if(token){
+  //       if(isLiked){
+  //         return 'like-btn liked-disabled'
+  //       }
+  //       else{
+  //         return 'like-btn'
+  //       }
+  //     }
+  //   }
+  //   return 'like-btn inactive' // default
+  // }
 
   return (
     <article>
@@ -189,22 +221,26 @@ export function Recipe({
           handleCompleteSubmit={handleDeleteSubmission}
         />
       )}
-      {fullRecipe && token && (
-        <button type='button' onClick={handleLikeClick}>
-          {isLiked ? 'Unlike' : 'Like'}
-        </button>
-      )}
-      {fullRecipe && !token && (
-        <div>
-          <p>
-            <Link to='/login'>Log In</Link> to like this recipe!
-          </p>
-        </div>
-      )}
       <div>
-        <p>
-          {likes} {likes == 1 ? 'person' : 'people'} liked this recipe.
-        </p>
+        <button
+          type='button'
+          className={
+            isLiked
+              ? 'like-btn liked'
+              : fullRecipe && token
+                ? 'like-btn enabled'
+                : 'like-btn inactive'
+          }
+          disabled={!(fullRecipe && token)}
+          onClick={handleLikeClick}
+        >
+          <i className='fas fa-thumbs-up'>
+            <span className='like-btn-hover-text'>
+              {`${token ? 'Click on recipe' : 'Log in'} to like/unlike`}
+            </span>
+          </i>
+        </button>
+        <span>{likes > 999 ? `${likes / 1000} K` : likes}</span>
       </div>
     </article>
   )

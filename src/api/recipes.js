@@ -30,6 +30,7 @@ export const deleteRecipe = async (token, id) => {
 }
 
 export const updateRecipe = async (token, recipe) => {
+  console.log(`recipe being updated: ${recipe}`)
   recipe.ingredients = recipe.ingredients.split('\n')
   const res = await fetch(
     `${import.meta.env.VITE_BACKEND_URL}/recipes/${recipe.id}`,
