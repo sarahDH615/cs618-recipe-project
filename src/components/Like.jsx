@@ -6,16 +6,12 @@ import { useEffect, useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 // import { useQuery, useMutation } from '@tanstack/react-query'
 import { checkIfLiked, updateLike, getLikes } from '../api/likes.js'
-import { getRecipeById } from '../api/recipes.js'
+import { updateRecipe } from '../api/recipes.js'
 
-export function Like({ recipeId, fullRecipe }) {
+// export function Like({ recipeId, fullRecipe }) {
+export function Like({ recipe, fullRecipe }) {
   const [token] = useAuth()
-  const recipeQuery = useQuery({
-    queryKey: ['recipe', { recipeId }],
-    queryFn: () => getRecipeById(recipeId),
-  })
-  const recipeInfo = recipeQuery.data ?? false
-  const recipeTitle = recipeInfo ? recipeInfo.title : recipeId
+  const { recipeId, title, ingredients, image, likeCount } = { ...recipe }
   const { sub } = token ? jwtDecode(token) : { sub: '' } // decode to get the payload if logged in
   const userLikesRecipeQuery = useQuery({
     queryKey: ['like', { recipeId, sub }],
@@ -38,19 +34,30 @@ export function Like({ recipeId, fullRecipe }) {
     // onSuccess: (data) => data,
   })
   // // // -- MOSTLY WORKS
+  const updateCountMutation = useMutation({
+    mutationFn: () =>
+      updateRecipe(token, { title, ingredients, image, likeCount: likes }),
+    onSuccess: queryClient.invalidateQueries(['recipes']),
+  })
+
   useEffect(() => {
     // -- SETUP FUNCTION
     // const setupLikesQuery = useQuery({
     //     queryKey: ['likes', recipeId],
     //     queryFn: () => getLikes(recipeId),
     // })
-    const setupLikesCheck = totalLikesQuery.data ?? 0
+    // const setupLikesCheck = totalLikesQuery.data ?? 0
     setLikes(likes)
-    console.log(
-      `Setup function: like count for ${recipeTitle} in ${
-        fullRecipe ? 'full' : 'summary'
-      } view is ${likes}. Likes check: ${setupLikesCheck}`,
-    )
+    if (likes !== likeCount) {
+      console.log(`likes (${likes}) and like count (${likeCount}) do not match`)
+      updateCountMutation.mutate()
+    }
+    // console.log(
+    //   // `Setup function: like count for ${recipeTitle} in ${
+    //   `Setup function: like count for ${title} in ${
+    //     fullRecipe ? 'full' : 'summary'
+    //   } view is ${likes}. Likes check: ${setupLikesCheck}`,
+    // )
     // console.log(`Setup function: like count for ${recipeTitle} in ${fullRecipe ? 'full' : 'summary'} view is ${likes}. Likes check: ${setupLikesCheck}`)
 
     // --
@@ -60,27 +67,54 @@ export function Like({ recipeId, fullRecipe }) {
       //     queryKey: ['likes', recipeId],
       //     queryFn: () => getLikes(recipeId),
       // })
-      const cleanupLikesCheck = totalLikesQuery.data ?? 0
+      // const cleanupLikesCheck = totalLikesQuery.data ?? 0
       setLikes(likes)
-      console.log(
-        `Cleanup function: like count for ${recipeTitle} in ${
-          fullRecipe ? 'full' : 'summary'
-        } view is ${likes}. Likes check: ${cleanupLikesCheck}`,
-      )
+      // console.log(
+      //   // `Cleanup function: like count for ${recipeTitle} in ${
+      //   `Cleanup function: like count for ${title} in ${
+      //     fullRecipe ? 'full' : 'summary'
+      //   } view is ${likes}. Likes check: ${cleanupLikesCheck}`,
+      // )
       // console.log(`Cleanup function: like count for ${recipeTitle} in ${fullRecipe ? 'full' : 'summary'} view is ${likes}. Likes check: ${cleanupLikesCheck}`)
     }
     // --
   }, [likes, fullRecipe]) // dependencies: when like number or view changes
 
   const renderLikeCount = () => {
-    console.log(
-      `Rendering like count for recipe ${recipeTitle}: like count is ${likes}`,
-    )
+    // console.log(
+    //   // `Rendering like count for recipe ${recipeTitle}: like count is ${likes}`,
+    //   `Rendering like count for recipe ${title}: like count is ${likes}`,
+    // )
     if (likes > 999) {
       ;`${likes / 1000} K`
     }
     return likes
   }
+
+  // const likedButtonClass = () => {
+  //   if(fullRecipe){
+  //     if(token){
+  //       // logged in on full recipe page
+  //       if(isLiked){
+  //         return 'like-btn liked'
+  //       }
+  //       else { return 'like-btn enabled' }
+  //     }
+  //   }
+  //   // on summary page
+  //   else{
+  //     // logged in: show liked status and text popup
+  //     if(token){
+  //       if(isLiked){
+  //         return 'like-btn liked-disabled'
+  //       }
+  //       else{
+  //         return 'like-btn'
+  //       }
+  //     }
+  //   }
+  //   return 'like-btn inactive' // default
+  // }
 
   const handleLikeClick = () => {
     // saved to variable so that it can be used,
@@ -104,7 +138,8 @@ export function Like({ recipeId, fullRecipe }) {
       `${action} action with new like count of ${newLikeCount} from ${likes}`,
     )
     setLikes(newLikeCount)
-    updateLikeMutation.mutate(action)
+    updateLikeMutation.mutate(action) // update likes table
+    updateCountMutation.mutate() // update recipes table
     console.log(`Updated likes count: ${likes}`)
   }
 
@@ -134,7 +169,11 @@ export function Like({ recipeId, fullRecipe }) {
   )
 }
 
+// Like.propTypes = {
+//   recipeId: PropTypes.string.isRequired,
+//   fullRecipe: PropTypes.bool,
+// }
 Like.propTypes = {
-  recipeId: PropTypes.string.isRequired,
+  recipe: PropTypes.object.isRequired,
   fullRecipe: PropTypes.bool,
 }

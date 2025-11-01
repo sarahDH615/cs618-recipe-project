@@ -8,6 +8,7 @@ import { getRecipes } from '../api/recipes.js'
 import { useState } from 'react'
 import { Header } from '../components/Header.jsx'
 import { Helmet } from 'react-helmet-async'
+// import { useEffect, useState } from 'react'
 
 export function RecipeBlog() {
   const [author, setAuthor] = useState('') // default: ''
@@ -32,6 +33,22 @@ export function RecipeBlog() {
   //     recipe.likeCount = tlData
   //   }
   // }
+  // useEffect(() => {
+  //   // -- SETUP FUNCTION
+  //  for (const recipe of recipes) {
+  //     const totalLikes = useQuery({
+  //       queryKey: ['likes', recipe._id],
+  //       queryFn: () => getLikes(recipe._id),
+  //     })
+  //     const tlData = totalLikes.data ?? false
+  //     console.log(`total likes for recipe ${recipe._id}: ${tlData}`)
+  //     if (tlData) {
+  //       recipe.likeCount = tlData
+  //     }
+  //   }
+  //   // --
+  //   // no cleanup function
+  // },) // no dependencies, run on every re-render
   return (
     <div style={{ padding: 8 }}>
       <Helmet>

@@ -23,7 +23,7 @@ export function Recipe({
   image,
   author,
   _id,
-  // likeCount,
+  likeCount,
   fullRecipe = false,
 }) {
   // if(fullRecipe){
@@ -133,31 +133,6 @@ export function Recipe({
   //   console.log(`Updated likes count: ${likes}`)
   // }
 
-  // const likedButtonClass = () => {
-  //   if(fullRecipe){
-  //     if(token){
-  //       // logged in on full recipe page
-  //       if(isLiked){
-  //         return 'like-btn liked'
-  //       }
-  //       else { return 'like-btn enabled' }
-  //     }
-  //   }
-  //   // on summary page
-  //   else{
-  //     // logged in: show liked status and text popup
-  //     if(token){
-  //       if(isLiked){
-  //         return 'like-btn liked-disabled'
-  //       }
-  //       else{
-  //         return 'like-btn'
-  //       }
-  //     }
-  //   }
-  //   return 'like-btn inactive' // default
-  // }
-
   return (
     <article>
       {fullRecipe ? (
@@ -230,28 +205,11 @@ export function Recipe({
           handleCompleteSubmit={handleDeleteSubmission}
         />
       )}
-      <Like recipeId={_id} fullRecipe={fullRecipe} />
-      {/* <div>
-        <button
-          type='button'
-          className={
-            isLiked
-              ? 'like-btn liked'
-              : fullRecipe && token
-                ? 'like-btn enabled'
-                : 'like-btn inactive'
-          }
-          disabled={!(fullRecipe && token)}
-          onClick={handleLikeClick}
-        >
-          <i className='fas fa-thumbs-up'>
-            <span className='like-btn-hover-text'>
-              {`${token ? 'Click on recipe' : 'Log in'} to like/unlike`}
-            </span>
-          </i>
-        </button>
-        <span>{likes > 999 ? `${likes / 1000} K` : likes}</span>
-      </div> */}
+      {/* <Like recipeId={_id} fullRecipe={fullRecipe} /> */}
+      <Like
+        recipe={{ title, ingredients, image, likeCount, recipeId: _id }}
+        fullRecipe={fullRecipe}
+      />
     </article>
   )
 }
