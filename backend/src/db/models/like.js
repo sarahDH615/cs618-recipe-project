@@ -2,7 +2,7 @@ import mongoose, { Schema } from 'mongoose'
 // create schema
 const likeSchema = new Schema(
   {
-    post: { type: Schema.Types.ObjectId, ref: 'post', required: true }, // id of the post
+    recipe: { type: Schema.Types.ObjectId, ref: 'recipe', required: true }, // id of the recipe
     user: { type: Schema.Types.ObjectId, ref: 'user', required: true },
   },
   { timestamps: true }, // add timestamps to each entry

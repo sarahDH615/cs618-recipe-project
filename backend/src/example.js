@@ -13,5 +13,5 @@ await Recipe.findByIdAndUpdate(createdRecipe._id, {
   $set: { title: 'Cinnamon oatmeal' },
 })
 
-const recipes = await Recipe.find() // return all Post instances
+const recipes = await Recipe.find() // return all Recipe instances
 console.log(recipes)

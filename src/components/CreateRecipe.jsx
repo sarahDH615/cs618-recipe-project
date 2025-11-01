@@ -72,7 +72,7 @@ export function CreateRecipe() {
   if (!token) return <div>Please log in to create new recipes.</div>
 
   //   e.preventDefault prevents page refresh when a form is submitted
-  // prevent the submit button from clicking when there's no title or a post is pending
+  // prevent the submit button from clicking when there's no title or a recipe post is pending
   return (
     <form name='recipe' onSubmit={handleSubmit}>
       <button type='button' id='clear-fields' onClick={resetStates}>
@@ -102,7 +102,7 @@ export function CreateRecipe() {
 
       {createRecipeMutation.isSuccess && !modalDismissed && title ? (
         <Modal onClose={() => setModalDismissed(true)}>
-          <p>Post successfully created!</p>
+          <p>Recipe successfully created!</p>
         </Modal>
       ) : null}
     </form>

@@ -139,9 +139,9 @@ describe('listing recipes', () => {
     expect(recipes.length).toBe(1)
   })
   // test 5: filter by author
-  test('should be able to filter posts by author', async () => {
-    const posts = await listRecipesByAuthor(testUser.username)
-    expect(posts.length).toBe(4)
+  test('should be able to filter recipes by author', async () => {
+    const recipes = await listRecipesByAuthor(testUser.username)
+    expect(recipes.length).toBe(4)
   })
 })
 // GET

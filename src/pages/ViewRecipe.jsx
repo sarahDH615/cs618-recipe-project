@@ -72,6 +72,18 @@ export function ViewRecipe({ recipeId }) {
     enabled: Boolean(recipe?.author),
   })
   const userInfo = userInfoQuery.data ?? {}
+
+  // make sure likes are updated
+  // const totalLikes = useQuery({
+  //   queryKey: ['likes', recipeId],
+  //   queryFn: () => getLikes(recipeId),
+  // })
+  // const tlData = totalLikes.data ?? false
+  // // console.log(`total likes for recipe ${recipe._id}: ${tlData}`)
+  // if (tlData && recipe) {
+  //   recipe.likeCount = tlData
+  // }
+
   // header and link back to main page
   // if recipe was suuccessfully fetched, show recipe
   // otherwise show 'not found'

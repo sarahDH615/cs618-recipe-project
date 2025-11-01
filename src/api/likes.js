@@ -1,8 +1,8 @@
 export const getLikes = async (id) => {
-  console.log(`get likes request with id: ${id}`)
+  // console.log(`get likes request with id: ${id}`)
   const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/likes/${id}`)
   const resp = await res.json()
-  console.log(`resp from get likes: ${resp}`)
+  // console.log(`resp from get likes for recipe ${id}: ${resp}`)
   return resp
   // return await res.json()
 }
@@ -30,9 +30,9 @@ export const updateLike = async (id, token, action) => {
 }
 
 export const removeLike = async (token, id) => {
-  console.log(
-    `remove like endpoint: ${import.meta.env.VITE_BACKEND_URL}/likes/${id}`,
-  )
+  // console.log(
+  //   `remove like endpoint: ${import.meta.env.VITE_BACKEND_URL}/likes/${id}`,
+  // )
   const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/likes/${id}`, {
     method: 'DELETE',
     headers: {
@@ -40,7 +40,7 @@ export const removeLike = async (token, id) => {
       Authorization: `Bearer ${token}`,
     },
   })
-  console.log(res)
+  console.log(`result from remove like: ${res}`)
   return await res.json()
 }
 
@@ -52,5 +52,6 @@ export const addLike = async (token, id) => {
       Authorization: `Bearer ${token}`,
     },
   })
+  console.log(`result from add like: ${res}`)
   return await res.json()
 }

@@ -11,8 +11,6 @@ import { requireAuth } from '../middleware/jwt.js'
 export function likesRoutes(app) {
   // get count of likes for a recipe
   app.get('/api/v1/likes/:id', async (req, res) => {
-    // console.log(`REQ PARAMS: ${Object.keys(req.params)}`)
-    // console.log(`id param: ${req.params.id}`)
     try {
       const likes = await countLikes(req.params.id)
       if (likes === null) {
@@ -27,7 +25,6 @@ export function likesRoutes(app) {
   // check whether a user has liked a recipe
   app.get('/api/v1/likes/:id/:userid', async (req, res) => {
     const hasLiked = await userHasLiked(req.params.userid, req.params.id)
-    // console.log(`${req.params.userid} has liked post ${req.params.id}: ${hasLiked}`)
     return res.json(hasLiked)
   })
   // add a like

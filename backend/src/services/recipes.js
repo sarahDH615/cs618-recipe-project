@@ -22,7 +22,7 @@ export async function listRecipesByAuthor(authorUsername, options) {
   if (!user) return []
   return await listRecipes({ author: user._id }, options)
 }
-// list posts by title by passing in title as query to listRecipes()
+// list recipes by title by passing in title as query to listRecipes()
 export async function listRecipesByTitle(title, options) {
   return await listRecipes({ title }, options)
 }

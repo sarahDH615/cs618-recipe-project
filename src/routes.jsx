@@ -64,7 +64,7 @@ export const routes = [
   {
     path: '/recipes/:recipeId/:slug?',
     loader: async ({ params }) => {
-      // preload the post with the given id
+      // preload the recipe with the given id
       const recipeId = params.recipeId
       const queryClient = new QueryClient()
       const recipe = await getRecipeById(recipeId)
@@ -80,7 +80,7 @@ export const routes = [
           queryFn: () => getUserInfo(recipe.author),
         })
       }
-      // // get likes count for the recipe
+      // get likes count for the recipe
       // await queryClient.prefetchQuery({
       //   queryKey: ['likes', recipe._id],
       //   queryFn: () => getLikes(recipe._id),
