@@ -12,6 +12,7 @@ import { updateRecipe } from '../api/recipes.js'
 export function Like({ recipe, fullRecipe }) {
   const [token] = useAuth()
   const { recipeId, title, ingredients, image, likeCount } = { ...recipe }
+  // console.log(`token check ${token} -- is null? : ${token === null}`)
   const { sub } = token ? jwtDecode(token) : { sub: '' } // decode to get the payload if logged in
   const userLikesRecipeQuery = useQuery({
     queryKey: ['like', { recipeId, sub }],
@@ -36,7 +37,12 @@ export function Like({ recipe, fullRecipe }) {
   // // // -- MOSTLY WORKS
   const updateCountMutation = useMutation({
     mutationFn: () =>
-      updateRecipe(token, { title, ingredients, image, likeCount: likes }),
+      updateRecipe(token, recipeId, {
+        title,
+        ingredients,
+        image,
+        likeCount: likes,
+      }),
     onSuccess: queryClient.invalidateQueries(['recipes']),
   })
 
@@ -48,9 +54,16 @@ export function Like({ recipe, fullRecipe }) {
     // })
     // const setupLikesCheck = totalLikesQuery.data ?? 0
     setLikes(likes)
+    // if (likes !== likeCount && token) {
     if (likes !== likeCount) {
-      console.log(`likes (${likes}) and like count (${likeCount}) do not match`)
-      updateCountMutation.mutate()
+      console.log(
+        `likes (${likes}) and like count (${likeCount}) do not match for ${title}`,
+      )
+      console.log(`token to be sent with the request: ${token}`)
+      // updateCountMutation.mutate()
+      if (token) {
+        updateCountMutation.mutate()
+      }
     }
     // console.log(
     //   // `Setup function: like count for ${recipeTitle} in ${
@@ -139,7 +152,9 @@ export function Like({ recipe, fullRecipe }) {
     )
     setLikes(newLikeCount)
     updateLikeMutation.mutate(action) // update likes table
-    updateCountMutation.mutate() // update recipes table
+    if (token) {
+      updateCountMutation.mutate() // update recipes table
+    }
     console.log(`Updated likes count: ${likes}`)
   }
 
