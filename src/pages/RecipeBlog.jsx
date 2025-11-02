@@ -5,6 +5,7 @@ import { RecipeSorting } from '../components/RecipeSorting.jsx'
 import { useQuery } from '@tanstack/react-query'
 import { getRecipes } from '../api/recipes.js'
 // import { getLikes } from '../api/likes.js'
+// import { useEffect, useState } from 'react'
 import { useState } from 'react'
 import { Header } from '../components/Header.jsx'
 import { Helmet } from 'react-helmet-async'
@@ -22,6 +23,7 @@ export function RecipeBlog() {
   })
 
   const recipes = recipesQuery.data ?? [] // get data from the query
+
   // for (const recipe of recipes) {
   //   const totalLikes = useQuery({
   //     queryKey: ['likes', recipe._id],
@@ -33,22 +35,6 @@ export function RecipeBlog() {
   //     recipe.likeCount = tlData
   //   }
   // }
-  // useEffect(() => {
-  //   // -- SETUP FUNCTION
-  //  for (const recipe of recipes) {
-  //     const totalLikes = useQuery({
-  //       queryKey: ['likes', recipe._id],
-  //       queryFn: () => getLikes(recipe._id),
-  //     })
-  //     const tlData = totalLikes.data ?? false
-  //     console.log(`total likes for recipe ${recipe._id}: ${tlData}`)
-  //     if (tlData) {
-  //       recipe.likeCount = tlData
-  //     }
-  //   }
-  //   // --
-  //   // no cleanup function
-  // },) // no dependencies, run on every re-render
   return (
     <div style={{ padding: 8 }}>
       <Helmet>

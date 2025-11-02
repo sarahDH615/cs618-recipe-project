@@ -25,7 +25,7 @@ export const updateLike = async (id, token, action) => {
   } else {
     result = await removeLike(token, id)
   }
-  console.log(`update like result: ${result}`)
+  console.log(`update like result: ${JSON.stringify(result)}`)
   return result
 }
 
@@ -52,6 +52,6 @@ export const addLike = async (token, id) => {
       Authorization: `Bearer ${token}`,
     },
   })
-  console.log(`result from add like: ${res}`)
+  console.log(`result from add like: ${JSON.stringify(res)}`)
   return await res.json()
 }

@@ -27,8 +27,7 @@ export function EditRecipe({
   const queryClient = useQueryClient()
   const editRecipeMutation = useMutation({
     mutationFn: () =>
-      updateRecipe(token, {
-        id: id,
+      updateRecipe(token, id, {
         title: newTitle,
         ingredients: newIngredients,
         image: newImage,

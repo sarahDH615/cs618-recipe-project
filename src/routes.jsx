@@ -22,6 +22,8 @@ export const routes = [
       const sortBy = 'createdAt'
       const sortOrder = 'descending'
       const recipes = await getRecipes({ author, sortBy, sortOrder })
+      console.log(`number of recipes found: ${recipes.length}`)
+      console.log(' / : prefetching recipe info')
       await queryClient.prefetchQuery({
         queryKey: ['recipes', { author, sortBy, sortOrder }],
         queryFn: () => recipes,
@@ -29,12 +31,14 @@ export const routes = [
       const uniqueAuthors = recipes
         .map((recipe) => recipe.author)
         .filter((value, index, array) => array.indexOf(value) === index)
+      console.log(' / : prefetching author info')
       for (const userId of uniqueAuthors) {
         await queryClient.prefetchQuery({
           queryKey: ['users', userId],
           queryFn: () => getUserInfo(userId),
         })
       }
+      console.log(' / : prefetching like counts')
       // get likes count
       for (const recipe of recipes) {
         await queryClient.prefetchQuery({
@@ -68,11 +72,13 @@ export const routes = [
       const recipeId = params.recipeId
       const queryClient = new QueryClient()
       const recipe = await getRecipeById(recipeId)
+      console.log(' /recipes/recipeId : prefetching recipe info')
       // cache data from the recipe
       await queryClient.prefetchQuery({
         queryKey: ['recipe', recipeId],
         queryFn: () => recipe,
       })
+      console.log(' /recipes/recipeId : prefetching author info')
       // cache author info for the recipe
       if (recipe?.author) {
         await queryClient.prefetchQuery({

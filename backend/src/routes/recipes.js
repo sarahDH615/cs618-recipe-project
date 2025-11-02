@@ -12,12 +12,9 @@ import { requireAuth } from '../middleware/jwt.js'
 export function recipesRoutes(app) {
   // get all recipes
   app.get('/api/v1/recipes', async (req, res) => {
-    // const { sortBy, sortOrder, title } = req.query
     const { sortBy, sortOrder, author } = req.query
     const options = { sortBy, sortOrder }
     try {
-      // if (title) {
-      //   return res.json(await listRecipesByTitle(title, options))
       if (author) {
         return res.json(await listRecipesByAuthor(author, options))
       } else {

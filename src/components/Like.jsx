@@ -1,17 +1,19 @@
 import PropTypes from 'prop-types'
 import { jwtDecode } from 'jwt-decode'
 import { useAuth } from '../contexts/AuthContext.jsx'
-import { useEffect, useState } from 'react'
-// import { useState } from 'react'
+// import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 // import { useQuery, useMutation } from '@tanstack/react-query'
 import { checkIfLiked, updateLike, getLikes } from '../api/likes.js'
 import { updateRecipe } from '../api/recipes.js'
+// import { getRecipeById } from '../api/recipes.js'
 
 // export function Like({ recipeId, fullRecipe }) {
 export function Like({ recipe, fullRecipe }) {
   const [token] = useAuth()
-  const { recipeId, title, ingredients, image, likeCount } = { ...recipe }
+  // const { recipeId, title, ingredients, image, likeCount } = { ...recipe }
+  const { recipeId, title, ingredients, image } = { ...recipe }
   // console.log(`token check ${token} -- is null? : ${token === null}`)
   const { sub } = token ? jwtDecode(token) : { sub: '' } // decode to get the payload if logged in
   const userLikesRecipeQuery = useQuery({
@@ -36,68 +38,45 @@ export function Like({ recipe, fullRecipe }) {
   })
   // // // -- MOSTLY WORKS
   const updateCountMutation = useMutation({
-    mutationFn: () =>
+    mutationFn: () => {
       updateRecipe(token, recipeId, {
-        title,
-        ingredients,
-        image,
+        title: title,
+        ingredients: ingredients,
+        image: image,
         likeCount: likes,
-      }),
+      })
+    },
     onSuccess: queryClient.invalidateQueries(['recipes']),
   })
+  // const recipeQuery = useQuery({
+  //   queryKey: ['recipe', recipeId], // the endpoint it reads and the params it passes to it
+  //   queryFn: () => getRecipeById(recipeId), // the function it calls to read the endpoint
+  // })
 
-  useEffect(() => {
-    // -- SETUP FUNCTION
-    // const setupLikesQuery = useQuery({
-    //     queryKey: ['likes', recipeId],
-    //     queryFn: () => getLikes(recipeId),
-    // })
-    // const setupLikesCheck = totalLikesQuery.data ?? 0
-    setLikes(likes)
-    // if (likes !== likeCount && token) {
-    if (likes !== likeCount) {
-      console.log(
-        `likes (${likes}) and like count (${likeCount}) do not match for ${title}`,
-      )
-      console.log(`token to be sent with the request: ${token}`)
-      // updateCountMutation.mutate()
-      if (token) {
-        updateCountMutation.mutate()
-      }
-    }
-    // console.log(
-    //   // `Setup function: like count for ${recipeTitle} in ${
-    //   `Setup function: like count for ${title} in ${
-    //     fullRecipe ? 'full' : 'summary'
-    //   } view is ${likes}. Likes check: ${setupLikesCheck}`,
-    // )
-    // console.log(`Setup function: like count for ${recipeTitle} in ${fullRecipe ? 'full' : 'summary'} view is ${likes}. Likes check: ${setupLikesCheck}`)
-
-    // --
-    // CLEANUP FUNCTION : ie, when user leaves the page
-    return () => {
-      // const cleanupLikesQuery = useQuery({
-      //     queryKey: ['likes', recipeId],
-      //     queryFn: () => getLikes(recipeId),
-      // })
-      // const cleanupLikesCheck = totalLikesQuery.data ?? 0
-      setLikes(likes)
-      // console.log(
-      //   // `Cleanup function: like count for ${recipeTitle} in ${
-      //   `Cleanup function: like count for ${title} in ${
-      //     fullRecipe ? 'full' : 'summary'
-      //   } view is ${likes}. Likes check: ${cleanupLikesCheck}`,
-      // )
-      // console.log(`Cleanup function: like count for ${recipeTitle} in ${fullRecipe ? 'full' : 'summary'} view is ${likes}. Likes check: ${cleanupLikesCheck}`)
-    }
-    // --
-  }, [likes, fullRecipe]) // dependencies: when like number or view changes
+  // useEffect(() => {
+  //   // -- SETUP FUNCTION
+  //   setLikes(likes)
+  //   if (likes !== likeCount) {
+  //     console.log(
+  //       `likes (${likes}) and like count (${likeCount}) do not match for ${title}`,
+  //     )
+  //     if (token) {
+  //       console.log(`sending request to update the count`)
+  //       updateCountMutation.mutate()
+  //       if(recipeQuery.data){
+  //         console.log(`refetched recipe: ${JSON.stringify(recipeQuery.data)}`)
+  //       }
+  //     }
+  //   }
+  //   // --
+  //   // CLEANUP FUNCTION : ie, when user leaves the page
+  //   return () => {
+  //     setLikes(likes)
+  //   }
+  //   // --
+  // }, [likes, fullRecipe]) // dependencies: when like number or view changes
 
   const renderLikeCount = () => {
-    // console.log(
-    //   // `Rendering like count for recipe ${recipeTitle}: like count is ${likes}`,
-    //   `Rendering like count for recipe ${title}: like count is ${likes}`,
-    // )
     if (likes > 999) {
       ;`${likes / 1000} K`
     }

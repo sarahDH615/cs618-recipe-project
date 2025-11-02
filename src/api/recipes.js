@@ -30,11 +30,10 @@ export const deleteRecipe = async (token, id) => {
 }
 
 export const updateRecipe = async (token, id, recipe) => {
-  // console.log(`recipe being updated: ${JSON.stringify(recipe)}`)
-  console.log(`UPDATE RECIPE token: ${token}`)
-  console.log(`ID: ${id}`)
-  console.log(`url: ${`${import.meta.env.VITE_BACKEND_URL}/recipes/${id}`}`)
-  recipe.ingredients = recipe.ingredients.split('\n')
+  console.log('attepting recipe update')
+  recipe.ingredients = await splitIngredients(recipe.ingredients)
+  console.log(`after ingredients update: ${recipe.ingredients}`)
+  console.log(`string of recipe: ${JSON.stringify(recipe)}`)
   const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/recipes/${id}`, {
     method: 'PATCH',
     headers: {
@@ -43,12 +42,11 @@ export const updateRecipe = async (token, id, recipe) => {
     },
     body: JSON.stringify(recipe),
   })
-  console.log(`response: ${res}`)
   return await res.json()
 }
 
 export const createRecipe = async (token, recipe) => {
-  recipe.ingredients = recipe.ingredients.split('\n')
+  recipe.ingredients = await splitIngredients(recipe.ingredients)
   const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/recipes`, {
     method: 'POST',
     headers: {
@@ -58,4 +56,16 @@ export const createRecipe = async (token, recipe) => {
     body: JSON.stringify(recipe),
   })
   return await res.json()
+}
+
+const splitIngredients = async (ingredients) => {
+  if (ingredients instanceof String) {
+    console.log('ingredients are an string, splitting on \\n')
+    return ingredients.split('\n')
+  } else if (ingredients instanceof Object) {
+    console.log('ingredients are an object, getting values from it')
+    // return Array.from(Object.values(ingredients))
+    return Object.values(ingredients)
+  }
+  return ingredients
 }
