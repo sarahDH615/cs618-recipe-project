@@ -56,9 +56,11 @@ export function Like({ recipe, fullRecipe }) {
   // useEffect(() => {
   //   // -- SETUP FUNCTION
   //   setLikes(likes)
-  //   if (likes !== likeCount) {
+  //   let recipeRecheckData = recipeQuery.data
+  //   console.log(`likes: ${likes}, recipe data likes: ${recipeRecheckData && recipeRecheckData.likeCount ? recipeRecheckData.likeCount : 'not found'}`)
+  //   if (recipeRecheckData && recipeRecheckData.likeCount && likes !== recipeRecheckData.likeCount) {
   //     console.log(
-  //       `likes (${likes}) and like count (${likeCount}) do not match for ${title}`,
+  //       `likes (${likes}) and like count (${recipeRecheckData.likeCount}) do not match for ${title}`,
   //     )
   //     if (token) {
   //       console.log(`sending request to update the count`)
@@ -72,8 +74,21 @@ export function Like({ recipe, fullRecipe }) {
   //   // CLEANUP FUNCTION : ie, when user leaves the page
   //   return () => {
   //     setLikes(likes)
+  //     let recipeRecheckData = recipeQuery.data
+  //     if (recipeRecheckData && recipeRecheckData.likeCount && likes !== recipeRecheckData.likeCount) {
+  //       console.log(
+  //         `likes (${likes}) and like count (${recipeRecheckData.likeCount}) do not match for ${title}`,
+  //       )
+  //       if (token) {
+  //         console.log(`sending request to update the count`)
+  //         updateCountMutation.mutate()
+  //         if(recipeQuery.data){
+  //           console.log(`refetched recipe: ${JSON.stringify(recipeQuery.data)}`)
+  //         }
+  //       }
+  //     }
   //   }
-  //   // --
+  // --
   // }, [likes, fullRecipe]) // dependencies: when like number or view changes
 
   const renderLikeCount = () => {

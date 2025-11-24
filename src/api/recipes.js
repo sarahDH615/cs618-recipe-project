@@ -30,7 +30,6 @@ export const deleteRecipe = async (token, id) => {
 }
 
 export const updateRecipe = async (token, id, recipe) => {
-  console.log('attepting recipe update')
   recipe.ingredients = await splitIngredients(recipe.ingredients)
   console.log(`after ingredients update: ${recipe.ingredients}`)
   console.log(`string of recipe: ${JSON.stringify(recipe)}`)
@@ -47,6 +46,8 @@ export const updateRecipe = async (token, id, recipe) => {
 
 export const createRecipe = async (token, recipe) => {
   recipe.ingredients = await splitIngredients(recipe.ingredients)
+  console.log(`after ingredients update: ${recipe.ingredients}`)
+  console.log(`string of recipe: ${JSON.stringify(recipe)}`)
   const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/recipes`, {
     method: 'POST',
     headers: {
@@ -59,13 +60,20 @@ export const createRecipe = async (token, recipe) => {
 }
 
 const splitIngredients = async (ingredients) => {
-  if (ingredients instanceof String) {
-    console.log('ingredients are an string, splitting on \\n')
-    return ingredients.split('\n')
-  } else if (ingredients instanceof Object) {
+  if (ingredients instanceof Object) {
     console.log('ingredients are an object, getting values from it')
     // return Array.from(Object.values(ingredients))
-    return Object.values(ingredients)
+    return Object.values(ingredients).flatMap((i) => i.split('\n'))
   }
-  return ingredients
+  if (ingredients instanceof Array) {
+    return ingredients
+  } else {
+    console.log(
+      `ingredients is a ${typeof ingredients}, is it a String?: ${
+        ingredients instanceof String
+      }`,
+    )
+    console.log(`ingredients include newline: ${ingredients.includes('\n')}`)
+    return ingredients.split('\n')
+  }
 }
