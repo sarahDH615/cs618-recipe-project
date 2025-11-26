@@ -1,12 +1,20 @@
 import { useState } from 'react'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { createRecipe } from '../api/recipes.js'
+// import { useMutation, useQueryClient } from '@tanstack/react-query'
+// import { createRecipe } from '../api/recipes.js'
 import { uploadImage } from '../api/images.js'
 import { useAuth } from '../contexts/AuthContext.jsx'
 import { RecipeTitle } from './RecipeTitle.jsx'
 import { RecipeIngredients } from './RecipeIngredients.jsx'
 import { ImageUploader } from './ImageUploader.jsx'
 import { Modal } from '../components/Modal.jsx'
+import { useMutation as useGraphQLMutation } from '@apollo/client/react/index.js'
+import {
+  CREATE_RECIPE,
+  GET_RECIPES,
+  GET_RECIPES_BY_AUTHOR,
+} from '../api/graphql/recipes.js'
+import { Link } from 'react-router-dom'
+import slug from 'slug'
 
 export function CreateRecipe() {
   const [title, setTitle] = useState('') // default: ''
@@ -19,10 +27,15 @@ export function CreateRecipe() {
   const [imageUploaderKey, setImageUploaderKey] = useState(1)
   const [modalDismissed, setModalDismissed] = useState(false)
 
-  const queryClient = useQueryClient()
-  const createRecipeMutation = useMutation({
-    mutationFn: () => createRecipe(token, { title, ingredients, image }),
-    onSuccess: () => queryClient.invalidateQueries(['recipes']), // means only the recipes part of the page will update
+  // const queryClient = useQueryClient()
+  // const createRecipeMutation = useMutation({
+  //   mutationFn: () => createRecipe(token, { title, ingredients, image }),
+  //   onSuccess: () => queryClient.invalidateQueries(['recipes']), // means only the recipes part of the page will update
+  // })
+  const [createRecipe, { loading, data }] = useGraphQLMutation(CREATE_RECIPE, {
+    variables: { title, ingredients: ingredients.split('\n'), image },
+    context: { headers: { Authorization: `Bearer ${token}` } },
+    refetchQueries: [GET_RECIPES, GET_RECIPES_BY_AUTHOR],
   })
 
   const updateTitle = (e) => {
@@ -66,7 +79,8 @@ export function CreateRecipe() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    createRecipeMutation.mutate()
+    // createRecipeMutation.mutate()
+    createRecipe()
   }
 
   if (!token) return <div>Please log in to create new recipes.</div>
@@ -90,19 +104,31 @@ export function CreateRecipe() {
         handleImageSelection={updateFileSelection}
         handleImageRemoval={removeSelectedImage}
       />
+
       <input
         type='submit'
-        value={createRecipeMutation.isPending ? 'Creating...' : 'Create'}
-        disabled={
-          !title ||
-          (!isConfirmed && isSelected) ||
-          createRecipeMutation.isPending
-        }
+        value={loading ? 'Creating...' : 'Create'}
+        disabled={!title || (!isConfirmed && isSelected) || loading}
       />
 
-      {createRecipeMutation.isSuccess && !modalDismissed && title ? (
+      {/* {createRecipeMutation.isSuccess && !modalDismissed && title ? (
         <Modal onClose={() => setModalDismissed(true)}>
           <p>Recipe successfully created!</p>
+        </Modal>
+      ) : null} */}
+      {data?.createRecipe && !modalDismissed && title ? (
+        <Modal onClose={() => setModalDismissed(true)}>
+          <p>
+            Recipe{' '}
+            <Link
+              to={`/recipes/${data.createRecipe.id}/${slug(
+                data.createRecipe.title,
+              )}`}
+            >
+              {data.createRecipe.title}
+            </Link>{' '}
+            successfully created!
+          </p>
         </Modal>
       ) : null}
     </form>

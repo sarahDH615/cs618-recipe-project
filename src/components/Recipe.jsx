@@ -16,19 +16,15 @@ import slug from 'slug'
 // import { useMutation, useQueryClient } from '@tanstack/react-query'
 // import { updateRecipe } from './api/recipes.js'
 
-// export function Recipe({ title, ingredients, image, author, id, authorId, fullRecipe = false }) {
 export function Recipe({
   title,
   ingredients,
   image,
   author,
-  _id,
+  id,
   likeCount,
   fullRecipe = false,
 }) {
-  // if(fullRecipe){
-  //   console.log(`full recipe: RECIPE LIKE COUNT: ${likeCount}`)
-  // }
   const [token] = useAuth()
   const [statusIsEdit, setStatusIsEdit] = useState(false)
   const [statusIsDelete, setStatusIsDelete] = useState(false)
@@ -98,22 +94,26 @@ export function Recipe({
   // like count should be stored on recipe, or a separate table
 
   const handleDeleteRequest = async () => {
-    console.log(`Delete request for recipe id ${_id}`)
+    // console.log(`Delete request for recipe id ${_id}`)
+    console.log(`Delete request for recipe id ${id}`)
     setStatusIsDelete(true)
   }
 
   const handleDeleteSubmission = async () => {
-    console.log(`After delete request for recipe id ${_id}`)
+    // console.log(`After delete request for recipe id ${_id}`)
+    console.log(`After delete request for recipe id ${id}`)
     setStatusIsDelete(false)
   }
 
   const handleEditRequest = () => {
-    console.log(`Edit request for recipe id ${_id}`)
+    // console.log(`Edit request for recipe id ${_id}`)
+    console.log(`Edit request for recipe id ${id}`)
     setStatusIsEdit(true)
   }
 
   const handleEditSubmission = async () => {
-    console.log(`After edit request for recipe id ${_id}`)
+    // console.log(`After edit request for recipe id ${_id}`)
+    console.log(`After edit request for recipe id ${id}`)
     setStatusIsEdit(false)
   }
 
@@ -138,7 +138,7 @@ export function Recipe({
       {fullRecipe ? (
         <h3>{title}</h3>
       ) : (
-        <Link to={`/recipes/${_id}/${slug(title)}`}>
+        <Link to={`/recipes/${id}/${slug(title)}`}>
           <h3>{title}</h3>
         </Link>
       )}
@@ -160,11 +160,9 @@ export function Recipe({
       )}
       {author && (
         <em>
-          {/* Written by <User {...author} /> */}
-          Written by <User id={author} />
+          Written by <User {...author} />
         </em>
       )}
-      {/* userId == sub */}
       {fullRecipe && authorIsUser && (
         <>
           <br />
@@ -189,7 +187,7 @@ export function Recipe({
       )}
       {fullRecipe && statusIsEdit && (
         <EditRecipe
-          id={_id}
+          id={id}
           title={title}
           ingredients={ingredients}
           image={image}
@@ -200,14 +198,13 @@ export function Recipe({
       )}
       {fullRecipe && statusIsDelete && (
         <DeleteRecipe
-          id={_id}
+          id={id}
           token={token}
           handleCompleteSubmit={handleDeleteSubmission}
         />
       )}
-      {/* <Like recipeId={_id} fullRecipe={fullRecipe} /> */}
       <Like
-        recipe={{ title, ingredients, image, likeCount, recipeId: _id }}
+        recipe={{ title, ingredients, image, likeCount, recipeId: id }}
         fullRecipe={fullRecipe}
       />
     </article>
@@ -215,11 +212,11 @@ export function Recipe({
 }
 
 Recipe.propTypes = {
-  _id: PropTypes.string.isRequired,
+  id: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
   ingredients: PropTypes.arrayOf(PropTypes.string),
   image: PropTypes.string,
-  author: PropTypes.string,
+  author: PropTypes.shape(User.propTypes),
   likeCount: PropTypes.number,
   fullRecipe: PropTypes.bool,
 }

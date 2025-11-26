@@ -1,4 +1,5 @@
 import { Like } from '../db/models/like.js'
+import { updateRecipeLikes } from './recipes.js'
 
 // add a like to the likes table
 export async function addLike(userId, recipeId) {
@@ -14,6 +15,8 @@ export async function removeLike(userId, recipeId) {
 // get count of likes for a recipe
 export async function countLikes(recipeId) {
   const likeCount = await Like.countDocuments({ recipe: recipeId })
+  // update the related recipe every time the like check occurs
+  await updateRecipeLikes(recipeId, parseInt(likeCount))
   return likeCount
 }
 

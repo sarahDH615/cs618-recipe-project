@@ -1,8 +1,10 @@
-import { useMutation } from '@tanstack/react-query'
+// import { useMutation } from '@tanstack/react-query'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { login } from '../api/users.js'
+// import { login } from '../api/users.js'
 import { useAuth } from '../contexts/AuthContext.jsx'
+import { useMutation as useGraphQLMutation } from '@apollo/client/react/index.js'
+import { LOGIN_USER } from '../api/graphql/users.js'
 
 export function Login() {
   const [, setToken] = useAuth() // leave first var blank(?)
@@ -10,18 +12,30 @@ export function Login() {
   const [password, setPassword] = useState('')
   const navigate = useNavigate()
 
-  const loginMutation = useMutation({
-    mutationFn: () => login({ username, password }),
-    onSuccess: (data) => {
-      setToken(data.token)
+  // const loginMutation = useMutation({
+  //   mutationFn: () => login({ username, password }),
+  //   onSuccess: (data) => {
+  //     setToken(data.token)
+  //     navigate('/')
+  //   },
+  //   onError: () => alert('failed to log in!'),
+  // })
+  // const handleSubmit = (e) => {
+  //   e.preventDefault()
+  //   loginMutation.mutate()
+  // }
+
+  const [loginUser, { loading }] = useGraphQLMutation(LOGIN_USER, {
+    variables: { username, password },
+    onCompleted: (data) => {
+      setToken(data.loginUser)
       navigate('/')
     },
     onError: () => alert('failed to log in!'),
   })
-
   const handleSubmit = (e) => {
     e.preventDefault()
-    loginMutation.mutate()
+    loginUser()
   }
 
   return (
@@ -50,10 +64,15 @@ export function Login() {
         />
       </div>
       <br />
-      <input
+      {/* <input
         type='submit'
         value={loginMutation.isPending ? 'Logging in...' : 'Log In'}
         disabled={!username || !password || loginMutation.isPending}
+      /> */}
+      <input
+        type='submit'
+        value={loading ? 'Logging in...' : 'Log In'}
+        disabled={!username || !password || loading}
       />
     </form>
   )

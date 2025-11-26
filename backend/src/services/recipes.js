@@ -54,6 +54,15 @@ export async function updateRecipe(
     { new: true },
   )
 }
+
+// update like count for a recipe
+export async function updateRecipeLikes(recipeId, updatedLikeCount) {
+  return await Recipe.findOneAndUpdate(
+    { _id: recipeId },
+    { $set: { likeCount: updatedLikeCount } },
+    { new: true },
+  )
+}
 // delete a recipe
 export async function deleteRecipe(userId, recipeId) {
   return await Recipe.deleteOne({ _id: recipeId, author: userId })

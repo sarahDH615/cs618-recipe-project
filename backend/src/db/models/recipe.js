@@ -8,7 +8,11 @@ const recipeSchema = new Schema(
     image: { type: String },
     likeCount: { type: Number, default: 0 }, // upon creation, zero likes
   },
-  { timestamps: true }, // add timestamps to each entry
+  {
+    timestamps: true, // add timestamps to each entry
+    toJSON: { virtuals: true }, // So `res.json()` and other `JSON.stringify()` functions include virtuals
+    toObject: { virtuals: true },
+  },
 )
 // create mongoose model from the schema
 // arg 0: the singular of the name of the collection

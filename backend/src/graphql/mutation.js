@@ -1,6 +1,11 @@
 import { GraphQLError } from 'graphql'
 import { createUser, loginUser } from '../services/users.js'
-import { createRecipe } from '../services/recipes.js'
+import {
+  createRecipe,
+  updateRecipe,
+  updateRecipeLikes,
+} from '../services/recipes.js'
+// import { addLike, removeLike, countLikes } from '../services/likes.js'
 import { addLike, removeLike } from '../services/likes.js'
 
 export const mutationSchema = `#graphql
@@ -8,8 +13,10 @@ export const mutationSchema = `#graphql
         signupUser(username: String!, password: String!): User
         loginUser(username: String!, password: String!): String
         createRecipe(title: String!, ingredients: [String], image: String): Recipe
+        updateRecipe(title: String!, ingredients: [String], image: String): Recipe
         addLike(recipeId: ID!): Like
         removeLike(recipeId: ID!): Like
+        refreshLikes(recipeId: ID!, likeCount: Int): Recipe
     }
 `
 
@@ -33,6 +40,19 @@ export const mutationResolver = {
         )
       }
       return await createRecipe(auth.sub, { title, ingredients, image })
+    },
+    updateRecipe: async (parent, { title, ingredients, image }, { auth }) => {
+      if (!auth) {
+        throw new GraphQLError(
+          'You need to be authenticated to perform this action.',
+          {
+            extensions: {
+              code: 'UNAUTHORISED',
+            },
+          },
+        )
+      }
+      return await updateRecipe(auth.sub, { title, ingredients, image })
     },
     addLike: async (parent, { recipeId }, { auth }) => {
       if (!auth) {
@@ -59,6 +79,13 @@ export const mutationResolver = {
         )
       }
       return await removeLike(auth.sub, recipeId)
+    },
+    // refreshLikes: async (parent, { recipeId }) => {
+    //   // const updatedLikes = await countLikes(recipeId)
+    //   return await updateRecipeLikes(recipeId, updatedLikes)
+    // }
+    refreshLikes: async (parent, { recipeId, likeCount }) => {
+      return await updateRecipeLikes(recipeId, likeCount)
     },
   },
 }
