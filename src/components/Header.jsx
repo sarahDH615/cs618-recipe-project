@@ -4,9 +4,11 @@ import { useAuth } from '../contexts/AuthContext.jsx'
 import { User } from './User.jsx'
 import { useQuery } from '@tanstack/react-query'
 import { getUserInfo } from '../api/users.js'
+import { useSocket } from '../contexts/SocketIOContext.jsx'
 
 export function Header() {
   const [token, setToken] = useAuth()
+  const { socket } = useSocket()
   const { sub } = token ? jwtDecode(token) : {}
   const userInfoQuery = useQuery({
     queryKey: ['users', sub],
@@ -15,13 +17,19 @@ export function Header() {
   })
   const userInfo = userInfoQuery.data
 
+  // handle log out: disconnect fromm socket and set token to null
+  const handleLogout = () => {
+    socket.disconnect()
+    setToken(null)
+  }
+
   if (token && userInfo) {
     return (
       <div>
         <span>
           Logged in as <User {...userInfo} />
         </span>
-        <button id='logout' onClick={() => setToken(null)}>
+        <button id='logout' onClick={handleLogout}>
           Log Out
         </button>
         <hr />

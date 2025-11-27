@@ -5,6 +5,7 @@ export const RECIPE_FIELDS = gql`
     id
     title
     author {
+      userId
       username
     }
     ingredients

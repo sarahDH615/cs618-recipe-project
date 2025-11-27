@@ -29,8 +29,7 @@ export function Recipe({
   const [statusIsEdit, setStatusIsEdit] = useState(false)
   const [statusIsDelete, setStatusIsDelete] = useState(false)
   const { sub } = token ? jwtDecode(token) : { sub: '' } // decode to get the payload if logged in
-  // const authorIsUser = sub == authorId
-  const authorIsUser = sub == author
+  const authorIsUser = sub == author.userId
   // const userLikesRecipeQuery = useQuery({
   //   queryKey: ['like', { _id, sub }], // the endpoint it reads and the params it passes to it
   //   queryFn: () => checkIfLiked(_id, sub), // the function it calls to read the endpoint

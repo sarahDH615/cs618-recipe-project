@@ -8,7 +8,11 @@ import { ApolloServer } from '@apollo/server'
 import { expressMiddleware } from '@apollo/server/express4'
 import { typeDefs, resolvers } from './graphql/index.js'
 import { optionalAuth } from './middleware/jwt.js'
+import { createServer } from 'node:http'
+import { Server } from 'socket.io'
+import { handleSocket } from './socket.js'
 
+// apollo server for interaction with the database through graphql
 const apolloServer = new ApolloServer({
   typeDefs,
   resolvers,
@@ -19,24 +23,7 @@ const app = express() // create express instance
 app.use(cors())
 app.use(bodyParser.json()) // intercepts the requests and converts them to json
 
-// apolloServer
-//   .start()
-//   .then(() => app.use('/graphql', expressMiddleware(apolloServer)))
-
-// app.use(optionalAuth)
-
-// apolloServer.start().then(() =>
-//   app.use(
-//     '/graphql',
-//     cors(),
-//     expressMiddleware(apolloServer, {
-//       context: async ({ req }) => {
-//         return { auth: req.auth }
-//       },
-//     }),
-//   ),
-// )
-
+// start the apollo server with optional authentication
 apolloServer.start().then(() =>
   app.use(
     '/graphql',
@@ -53,8 +40,18 @@ recipesRoutes(app)
 userRoutes(app)
 likesRoutes(app)
 
+// io server for event functionality
+const server = createServer(app)
+const io = new Server(server, {
+  cors: {
+    origin: '*',
+  },
+})
+handleSocket(io)
+
 // default route
 app.get('/', (req, res) => {
   res.send('Hello from Express!')
 })
-export { app }
+// export { app }
+export { server as app }

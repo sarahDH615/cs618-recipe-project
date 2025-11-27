@@ -13,8 +13,11 @@ import {
   GET_RECIPES,
   GET_RECIPES_BY_AUTHOR,
 } from '../api/graphql/recipes.js'
+// import { Link, useLinkClickHandler } from 'react-router-dom'
 import { Link } from 'react-router-dom'
 import slug from 'slug'
+// import { useSocket } from '../contexts/SocketIOContext.jsx'
+import { RecipeCreationNotification } from '../hooks/RecipeCreationNotification.jsx'
 
 export function CreateRecipe() {
   const [title, setTitle] = useState('') // default: ''
@@ -26,6 +29,9 @@ export function CreateRecipe() {
   const [token] = useAuth()
   const [imageUploaderKey, setImageUploaderKey] = useState(1)
   const [modalDismissed, setModalDismissed] = useState(false)
+  // const { socket, status } = useSocket()
+  // const { socket } = useSocket()
+  const { sendNotification } = RecipeCreationNotification()
 
   // const queryClient = useQueryClient()
   // const createRecipeMutation = useMutation({
@@ -36,7 +42,21 @@ export function CreateRecipe() {
     variables: { title, ingredients: ingredients.split('\n'), image },
     context: { headers: { Authorization: `Bearer ${token}` } },
     refetchQueries: [GET_RECIPES, GET_RECIPES_BY_AUTHOR],
+    onCompleted: async (data) => {
+      // if mutation successfully completes (a recipe is added)
+      // emit a message for all clients
+      console.log(`recipe created, id: ${data.createRecipe.id}`)
+      const link = `/recipes/${data.createRecipe.id}/${slug(
+        data.createRecipe.title,
+      )}`
+      // sendCreateMessage(`link to new recipe: ${link}`)
+      await sendNotification({ link: link, title: data.createRecipe.title })
+    },
   })
+
+  // const sendCreateMessage = (message) => {
+  //   socket.emit('recipe.notif', message)
+  // }
 
   const updateTitle = (e) => {
     setTitle(e.target.value)
@@ -79,7 +99,6 @@ export function CreateRecipe() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    // createRecipeMutation.mutate()
     createRecipe()
   }
 

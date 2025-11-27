@@ -6,7 +6,8 @@ export async function getUserInfoById(userId) {
   try {
     const user = await User.findById(userId)
     if (!user) return { username: userId }
-    return { username: user.username }
+    // console.log(`username: ${user.username}, userId: ${userId}`)
+    return { username: user.username, userId: userId }
   } catch (err) {
     return { username: userId }
   }

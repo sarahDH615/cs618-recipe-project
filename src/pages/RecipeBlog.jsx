@@ -5,8 +5,8 @@ import { RecipeSorting } from '../components/RecipeSorting.jsx'
 // import { useQuery } from '@tanstack/react-query'
 // import { getRecipes } from '../api/recipes.js'
 // import { getLikes } from '../api/likes.js'
-// import { useEffect, useState } from 'react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+// import { useState } from 'react'
 import { Header } from '../components/Header.jsx'
 import { Helmet } from 'react-helmet-async'
 import { useQuery as useGraphQLQuery } from '@apollo/client/react/index.js'
@@ -14,18 +14,31 @@ import { useQuery as useGraphQLQuery } from '@apollo/client/react/index.js'
 // import { GET_RECIPE_IDS, GET_RECIPES, GET_RECIPES_BY_AUTHOR, REFRESH_LIKES } from '../api/graphql/recipes.js'
 import { GET_RECIPES, GET_RECIPES_BY_AUTHOR } from '../api/graphql/recipes.js'
 // import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
+// import slug from 'slug'
+// import { useSocket } from '../contexts/SocketIOContext.jsx'
+import { RecipeCreationNotification } from '../hooks/RecipeCreationNotification.jsx'
+import { Modal } from '../components/Modal.jsx'
 
 export function RecipeBlog() {
   const [author, setAuthor] = useState('') // default: ''
   const [sortBy, setSortBy] = useState('createdAt')
   const [sortOrder, setSortOrder] = useState('descending')
+  // const { socket } = useSocket()
+  const { notification } = RecipeCreationNotification()
+  const [creationNotification, setCreationNotification] = useState(null)
+  const [modalDismissed, setModalDismissed] = useState(false)
 
-  // create query to call the backend and read an endpoint
-  // const recipesQuery = useQuery({
-  //   queryKey: ['recipes', { author, sortBy, sortOrder }], // the endpoint it reads and the params it passes to it
-  //   queryFn: () => getRecipes({ author, sortBy, sortOrder }), // the function it calls to read the endpoint
-  // })
-  // const recipes = recipesQuery.data ?? [] // get data from the query
+  // update with message
+  useEffect(() => {
+    console.log(`creationNotification: ${creationNotification}`)
+    return () => {
+      if (notification) {
+        console.log(`RECIPE BLOG: notification received: ${notification}`)
+        setCreationNotification(notification)
+      }
+    }
+  }, [notification])
 
   const recipesQuery = useGraphQLQuery(
     author ? GET_RECIPES_BY_AUTHOR : GET_RECIPES,
@@ -38,22 +51,6 @@ export function RecipeBlog() {
   const recipes =
     recipesQuery.data?.recipesByAuthor ?? recipesQuery.data?.recipes ?? []
 
-  for (const recipe of recipes) {
-    console.log(`recipe ${recipe.title} likes: ${recipe.likeCount}`)
-    // refreshLikes({ variables: { recipeId: recipe.id, likeCount: recipe.likeCount } })
-  }
-
-  // for (const recipe of recipes) {
-  //   const totalLikes = useQuery({
-  //     queryKey: ['likes', recipe._id],
-  //     queryFn: () => getLikes(recipe._id),
-  //   })
-  //   const tlData = totalLikes.data ?? false
-  //   console.log(`total likes for recipe ${recipe._id}: ${tlData}`)
-  //   if (tlData) {
-  //     recipe.likeCount = tlData
-  //   }
-  // }
   return (
     <div style={{ padding: 8 }}>
       <Helmet>
@@ -78,6 +75,20 @@ export function RecipeBlog() {
       />
       <hr />
       <RecipeList recipes={recipes} />
+      {!modalDismissed &&
+      creationNotification &&
+      creationNotification !== undefined &&
+      creationNotification !== null ? (
+        <Modal onClose={() => setModalDismissed(true)}>
+          <p>
+            New recipe{' '}
+            <Link to={creationNotification.link}>
+              {creationNotification.title}
+            </Link>{' '}
+            created!
+          </p>
+        </Modal>
+      ) : null}
     </div>
   )
 }
