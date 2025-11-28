@@ -31,24 +31,8 @@ export function RecipeBlog() {
 
   // update with message
   useEffect(() => {
-    // console.log(`creationNotification: ${creationNotification}`)
-    // console.log(`recipeNotification: ${recipeNotification}`)
     if (recipeNotification) {
-      console.log(
-        `RECIPE BLOG: notification received: ${JSON.stringify(
-          recipeNotification,
-        )}`,
-      )
       setCreationNotification(recipeNotification)
-    }
-    return () => {
-      console.log(
-        `IN RETURN: recipeNotification: ${JSON.stringify(recipeNotification)}`,
-      )
-      // if (recipeNotification && recipeNotification !== null && recipeNotification !== undefined) {
-      //   console.log(`RECIPE BLOG: notification received: ${JSON.stringify(recipeNotification)}`)
-      //   setCreationNotification(recipeNotification)
-      // }
     }
   }, [recipeNotification])
 

@@ -16,14 +16,6 @@ export const RECIPE_FIELDS = gql`
   }
 `
 
-export const GET_RECIPE_IDS = gql`
-  query getRecipes($options: RecipesOptions) {
-    recipes(options: $options) {
-      id
-    }
-  }
-`
-
 export const GET_RECIPES = gql`
   ${RECIPE_FIELDS}
   query getRecipes($options: RecipesOptions) {
@@ -54,14 +46,7 @@ export const CREATE_RECIPE = gql`
     }
   }
 `
-// export const REFRESH_LIKES = gql`
-//   mutation refreshLikes($recipeId: ID!) {
-//     refreshLikes(recipeId: $recipeId) {
-//       id
-//       title
-//     }
-//   }
-// `
+
 export const REFRESH_LIKES = gql`
   mutation refreshLikes($recipeId: ID!, $likeCount: Int) {
     refreshLikes(recipeId: $recipeId, likeCount: $likeCount) {

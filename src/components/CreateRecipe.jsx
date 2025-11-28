@@ -1,6 +1,4 @@
 import { useState } from 'react'
-// import { useMutation, useQueryClient } from '@tanstack/react-query'
-// import { createRecipe } from '../api/recipes.js'
 import { uploadImage } from '../api/images.js'
 import { useAuth } from '../contexts/AuthContext.jsx'
 import { RecipeTitle } from './RecipeTitle.jsx'
@@ -11,12 +9,10 @@ import { useMutation as useGraphQLMutation } from '@apollo/client/react/index.js
 import {
   CREATE_RECIPE,
   GET_RECIPES,
-  GET_RECIPES_BY_AUTHOR,
+  // GET_RECIPES_BY_AUTHOR,
 } from '../api/graphql/recipes.js'
-// import { Link, useLinkClickHandler } from 'react-router-dom'
 import { Link } from 'react-router-dom'
 import slug from 'slug'
-// import { useSocket } from '../contexts/SocketIOContext.jsx'
 import { RecipeCreationNotification } from '../hooks/RecipeCreationNotification.jsx'
 
 export function CreateRecipe() {
@@ -29,14 +25,13 @@ export function CreateRecipe() {
   const [token] = useAuth()
   const [imageUploaderKey, setImageUploaderKey] = useState(1)
   const [modalDismissed, setModalDismissed] = useState(false)
-  // const { socket, status } = useSocket()
-  // const { socket } = useSocket()
   const { sendNotification } = RecipeCreationNotification()
 
   const [createRecipe, { loading, data }] = useGraphQLMutation(CREATE_RECIPE, {
     variables: { title, ingredients: ingredients.split('\n'), image },
     context: { headers: { Authorization: `Bearer ${token}` } },
-    refetchQueries: [GET_RECIPES, GET_RECIPES_BY_AUTHOR],
+    // refetchQueries: [GET_RECIPES, GET_RECIPES_BY_AUTHOR],
+    refetchQueries: [GET_RECIPES],
     onCompleted: async (data) => {
       // if mutation successfully completes (a recipe is added)
       // emit a message for all clients
@@ -44,14 +39,9 @@ export function CreateRecipe() {
       const link = `/recipes/${data.createRecipe.id}/${slug(
         data.createRecipe.title,
       )}`
-      // sendCreateMessage({ link: link, title: data.createRecipe.title })
       await sendNotification({ link: link, title: data.createRecipe.title })
     },
   })
-
-  // const sendCreateMessage = (message) => {
-  //   socket.emit('recipe.notif', message)
-  // }
 
   const updateTitle = (e) => {
     setTitle(e.target.value)
@@ -125,11 +115,6 @@ export function CreateRecipe() {
         disabled={!title || (!isConfirmed && isSelected) || loading}
       />
 
-      {/* {createRecipeMutation.isSuccess && !modalDismissed && title ? (
-        <Modal onClose={() => setModalDismissed(true)}>
-          <p>Recipe successfully created!</p>
-        </Modal>
-      ) : null} */}
       {data?.createRecipe && !modalDismissed && title ? (
         <Modal onClose={() => setModalDismissed(true)}>
           <p>

@@ -2,8 +2,8 @@ import { listRecipesByAuthor } from '../services/recipes.js'
 
 export const userSchema = `#graphql
   type User {
+    userId: ID!
     username: String!
-    userId: String!
     recipes: [Recipe!]!
   }
 `

@@ -13,7 +13,6 @@ input RecipesOptions {
     sortOrder: String
   }  
 type Query {
-    test: String
     recipes(options: RecipesOptions): [Recipe!]!
     recipesByAuthor(username: String!, options: RecipesOptions): [Recipe!]!
     recipesByIngredient(ingredient: String!, options: RecipesOptions): [Recipe!]!
@@ -27,9 +26,6 @@ type Query {
 // parent as output of any previous queries
 export const queryResolver = {
   Query: {
-    test: () => {
-      return 'Hello World from GraphQL!'
-    },
     recipes: async (parent, { options }) => {
       return await listAllRecipes(options)
     },
