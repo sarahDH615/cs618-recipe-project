@@ -25,20 +25,32 @@ export function RecipeBlog() {
   const [sortBy, setSortBy] = useState('createdAt')
   const [sortOrder, setSortOrder] = useState('descending')
   // const { socket } = useSocket()
-  const { notification } = RecipeCreationNotification()
+  const { recipeNotification } = RecipeCreationNotification()
   const [creationNotification, setCreationNotification] = useState(null)
   const [modalDismissed, setModalDismissed] = useState(false)
 
   // update with message
   useEffect(() => {
-    console.log(`creationNotification: ${creationNotification}`)
-    return () => {
-      if (notification) {
-        console.log(`RECIPE BLOG: notification received: ${notification}`)
-        setCreationNotification(notification)
-      }
+    // console.log(`creationNotification: ${creationNotification}`)
+    // console.log(`recipeNotification: ${recipeNotification}`)
+    if (recipeNotification) {
+      console.log(
+        `RECIPE BLOG: notification received: ${JSON.stringify(
+          recipeNotification,
+        )}`,
+      )
+      setCreationNotification(recipeNotification)
     }
-  }, [notification])
+    return () => {
+      console.log(
+        `IN RETURN: recipeNotification: ${JSON.stringify(recipeNotification)}`,
+      )
+      // if (recipeNotification && recipeNotification !== null && recipeNotification !== undefined) {
+      //   console.log(`RECIPE BLOG: notification received: ${JSON.stringify(recipeNotification)}`)
+      //   setCreationNotification(recipeNotification)
+      // }
+    }
+  }, [recipeNotification])
 
   const recipesQuery = useGraphQLQuery(
     author ? GET_RECIPES_BY_AUTHOR : GET_RECIPES,
@@ -75,17 +87,13 @@ export function RecipeBlog() {
       />
       <hr />
       <RecipeList recipes={recipes} />
-      {!modalDismissed &&
-      creationNotification &&
-      creationNotification !== undefined &&
-      creationNotification !== null ? (
+      {!modalDismissed && creationNotification ? (
         <Modal onClose={() => setModalDismissed(true)}>
           <p>
-            New recipe{' '}
-            <Link to={creationNotification.link}>
-              {creationNotification.title}
-            </Link>{' '}
-            created!
+            New recipe {creationNotification.notification.title} made by{' '}
+            {creationNotification.username}! Click{' '}
+            <Link to={creationNotification.notification.link}>here</Link> to
+            read!
           </p>
         </Modal>
       ) : null}

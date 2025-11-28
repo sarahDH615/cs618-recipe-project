@@ -5,7 +5,7 @@ import { useSocket } from '../contexts/SocketIOContext.jsx'
 export function RecipeCreationNotification() {
   const { socket, status } = useSocket()
   // for storing messages sent into the browser by users
-  const [recipeNotification, setRecipeNotification] = useState({})
+  const [recipeNotification, setRecipeNotification] = useState(null)
 
   // updates the state variable to the received notification
   function receiveNotification(notification) {
@@ -16,8 +16,13 @@ export function RecipeCreationNotification() {
   // listens for broadcast emit from backend and updates notification variable
   useEffect(() => {
     if (status == 'connected') {
-      console.log('socket is connected')
-      socket.on('recipe.notif', receiveNotification)
+      // console.log('socket is connected')
+      socket.on('recipe.notif', (notif) => {
+        console.log(`Broadcast message received: ${JSON.stringify(notif)}`)
+        receiveNotification(notif)
+      })
+      // socket.on('recipe.notif', receiveNotification)
+      // remove listener on each page reload to prevent there being multiple listeners
       return () => socket.off('recipe.notif', receiveNotification)
     }
   }, [])

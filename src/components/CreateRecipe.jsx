@@ -33,11 +33,6 @@ export function CreateRecipe() {
   // const { socket } = useSocket()
   const { sendNotification } = RecipeCreationNotification()
 
-  // const queryClient = useQueryClient()
-  // const createRecipeMutation = useMutation({
-  //   mutationFn: () => createRecipe(token, { title, ingredients, image }),
-  //   onSuccess: () => queryClient.invalidateQueries(['recipes']), // means only the recipes part of the page will update
-  // })
   const [createRecipe, { loading, data }] = useGraphQLMutation(CREATE_RECIPE, {
     variables: { title, ingredients: ingredients.split('\n'), image },
     context: { headers: { Authorization: `Bearer ${token}` } },
@@ -45,11 +40,11 @@ export function CreateRecipe() {
     onCompleted: async (data) => {
       // if mutation successfully completes (a recipe is added)
       // emit a message for all clients
-      console.log(`recipe created, id: ${data.createRecipe.id}`)
+      // console.log(`recipe created, id: ${data.createRecipe.id}`)
       const link = `/recipes/${data.createRecipe.id}/${slug(
         data.createRecipe.title,
       )}`
-      // sendCreateMessage(`link to new recipe: ${link}`)
+      // sendCreateMessage({ link: link, title: data.createRecipe.title })
       await sendNotification({ link: link, title: data.createRecipe.title })
     },
   })
